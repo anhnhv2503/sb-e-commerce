@@ -24,7 +24,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartService cartService;
 
     @Override
-    public void addItemToCart(Long cartId, Long productId, int quantity) {
+    public Cart addItemToCart(Long cartId, Long productId, int quantity) {
         //get cart -> get product -> check if the product already in the cart -> if yes, update quantity - if no add new item
         Cart cart = cartService.getCart(cartId);
         Product product = productService.getProductById(productId);
@@ -44,8 +44,9 @@ public class CartItemServiceImpl implements CartItemService {
         }
         cartItem.setTotalPrice();
         cart.addToCart(cartItem);
+        cart.setTotalItems(cart.getCartItems().size());
         cartItemRepository.save(cartItem);
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void updateItemQuantity(Long cartId, Long productId, int quantity) {
+    public Cart updateItemQuantity(Long cartId, Long productId, int quantity) {
         Cart cart = cartService.getCart(cartId);
         cart.getCartItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
@@ -74,7 +75,7 @@ public class CartItemServiceImpl implements CartItemService {
                 .map(CartItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         cart.setTotalPrice(totalPrice);
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override

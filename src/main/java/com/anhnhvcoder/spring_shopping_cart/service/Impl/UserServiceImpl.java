@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email);
             user.setPassword(password);
             user.setAddress(address);
+//            user.setRoles;
             return userRepository.save(user);
         }else{
             throw new AlreadyExistedException("Email is already existed");

@@ -30,8 +30,8 @@ public class CartItemController {
         try {
             User user = userService.getUserById(1L);
             Cart cart = cartService.initializeNewCart(user);
-            cartItemService.addItemToCart(cart.getId(), productId, quantity);
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Item added to cart"));
+
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartItemService.addItemToCart(cart.getId(), productId, quantity)));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }
@@ -53,8 +53,8 @@ public class CartItemController {
                                                           @PathVariable Long productId,
                                                           @RequestParam("quantity") int quantity){
         try {
-            cartItemService.updateItemQuantity(cartId, productId, quantity);
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Item quantity updated"));
+
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartItemService.updateItemQuantity(cartId, productId, quantity)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }

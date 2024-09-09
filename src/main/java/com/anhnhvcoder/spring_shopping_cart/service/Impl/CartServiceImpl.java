@@ -41,6 +41,7 @@ public class CartServiceImpl implements CartService {
         cart.getCartItems().clear();
         cartRepository.deleteById(id);
         cart.setTotalPrice(BigDecimal.ZERO);
+        cart.setTotalItems(0);
     }
 
     @Override

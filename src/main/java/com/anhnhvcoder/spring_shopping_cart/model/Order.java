@@ -1,6 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.model;
 
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
 }
