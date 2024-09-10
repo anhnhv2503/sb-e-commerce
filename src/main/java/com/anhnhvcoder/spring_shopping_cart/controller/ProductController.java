@@ -6,6 +6,7 @@ import com.anhnhvcoder.spring_shopping_cart.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +21,7 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addProduct(@RequestParam("name") String name,
                                                   @RequestParam("brand") String brand,
@@ -46,6 +48,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id){
         productService.deleteProduct(id);
@@ -53,6 +56,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/update")
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id,
                                                      @RequestParam("name") String name,

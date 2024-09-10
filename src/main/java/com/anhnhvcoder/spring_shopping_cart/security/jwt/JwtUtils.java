@@ -2,7 +2,6 @@ package com.anhnhvcoder.spring_shopping_cart.security.jwt;
 
 import com.anhnhvcoder.spring_shopping_cart.security.user.ShopUserDetails;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoder;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
