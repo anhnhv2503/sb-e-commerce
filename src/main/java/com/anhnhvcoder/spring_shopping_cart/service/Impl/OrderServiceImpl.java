@@ -2,12 +2,10 @@ package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
-import com.anhnhvcoder.spring_shopping_cart.model.Cart;
-import com.anhnhvcoder.spring_shopping_cart.model.Order;
-import com.anhnhvcoder.spring_shopping_cart.model.OrderItem;
-import com.anhnhvcoder.spring_shopping_cart.model.Product;
+import com.anhnhvcoder.spring_shopping_cart.model.*;
 import com.anhnhvcoder.spring_shopping_cart.repository.OrderRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
+import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.CartService;
 import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final CartService cartService;
+    private final SizeRepository sizeRepository;
 
     @Transactional
     @Override
@@ -68,7 +67,11 @@ public class OrderServiceImpl implements OrderService {
     private List<OrderItem> createOrderItems(Order order, Cart cart){
         return cart.getCartItems().stream().map(cartItem -> {
             Product product = cartItem.getProduct();
-            product.setInventory(product.getInventory() - cartItem.getQuantity());
+
+            Size size = sizeRepository.findBySizeNameAndProductId(cartItem.getSize().getSizeName(), product.getId());
+            size.setQuantity(size.getQuantity() - cartItem.getQuantity());
+            sizeRepository.save(size);
+
             productRepository.save(product);
             return new OrderItem(cartItem.getQuantity(), product.getPrice(), product, order);
         }).toList();

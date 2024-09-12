@@ -4,8 +4,10 @@ import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.Cart;
 import com.anhnhvcoder.spring_shopping_cart.model.CartItem;
 import com.anhnhvcoder.spring_shopping_cart.model.Product;
+import com.anhnhvcoder.spring_shopping_cart.model.Size;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartItemRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartRepository;
+import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.CartItemService;
 import com.anhnhvcoder.spring_shopping_cart.service.CartService;
 import com.anhnhvcoder.spring_shopping_cart.service.ProductService;
@@ -22,12 +24,14 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartRepository cartRepository;
     private final ProductService productService;
     private final CartService cartService;
+    private final SizeRepository sizeRepository;
 
     @Override
-    public Cart addItemToCart(Long cartId, Long productId, int quantity) {
+    public Cart addItemToCart(Long cartId, Long productId, int quantity, Long sizeId) {
         //get cart -> get product -> check if the product already in the cart -> if yes, update quantity - if no add new item
         Cart cart = cartService.getCart(cartId);
         Product product = productService.getProductById(productId);
+        Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
         CartItem cartItem = cart.getCartItems()
                 .stream()
                 .filter(item ->
@@ -38,7 +42,7 @@ public class CartItemServiceImpl implements CartItemService {
             cartItem.setProduct(product);
             cartItem.setQuantity(quantity);
             cartItem.setUnitPrice(product.getPrice());
-
+            cartItem.setSize(size);
         }else{
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
         }

@@ -29,8 +29,9 @@ public class ProductController {
                                                   @RequestParam("price") BigDecimal price,
                                                   @RequestParam("inventory") int inventory,
                                                   @RequestParam("categoryId") Long categoryId,
+                                                  @RequestParam("sizeId") Long sizeId,
                                                   @RequestParam("images") MultipartFile[] images) throws IOException {
-        Product product = productService.addProduct(name, brand, description, price, inventory, categoryId, images);
+        Product product = productService.addProduct(name, brand, description, price, inventory, categoryId, sizeId, images);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), product);
         return ResponseEntity.ok(apiResponse);
     }
@@ -64,9 +65,10 @@ public class ProductController {
                                                      @RequestParam("description") String description,
                                                      @RequestParam("price") BigDecimal price,
                                                      @RequestParam("inventory") int inventory,
-                                                     @RequestParam("categoryId") Long categoryId
+                                                     @RequestParam("categoryId") Long categoryId,
+                                                     @RequestParam("sizeId") Long sizeId
                                                      ) throws IOException {
-        Product product = productService.updateProduct(id, name, brand, description, price, inventory, categoryId);
+        Product product = productService.updateProduct(id, name, brand, description, price, inventory, categoryId, sizeId);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), product);
         return ResponseEntity.ok(apiResponse);
     }

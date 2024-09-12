@@ -33,6 +33,22 @@ public class JwtUtils {
                 .claim("roles", roles)
                 .claim("username", userPrincipal.getUsername())
                 .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + 300000))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(Authentication authentication){
+        ShopUserDetails userPrincipal = (ShopUserDetails) authentication.getPrincipal();
+
+        List<String> roles = userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+
+        return Jwts.builder()
+                .setSubject(userPrincipal.getEmail())
+                .claim("id", userPrincipal.getId())
+                .claim("roles", roles)
+                .claim("username", userPrincipal.getUsername())
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();

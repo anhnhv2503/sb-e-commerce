@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -23,7 +24,9 @@ public class Product {
     private String brand;
     private String description;
     private BigDecimal price;
-    private int inventory;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Size> size;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

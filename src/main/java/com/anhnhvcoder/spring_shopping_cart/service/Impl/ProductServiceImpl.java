@@ -4,9 +4,11 @@ import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.Category;
 import com.anhnhvcoder.spring_shopping_cart.model.Product;
 import com.anhnhvcoder.spring_shopping_cart.model.ProductImages;
+import com.anhnhvcoder.spring_shopping_cart.model.Size;
 import com.anhnhvcoder.spring_shopping_cart.repository.CategoryRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.ProductImagesRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
+import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImagesRepository productImagesRepository;
     private final CategoryRepository categoryRepository;
     private final CloudinaryService cloudinaryService;
+    private final SizeRepository sizeRepository;
 
     @Override
     public Product addProduct(String name,
@@ -34,13 +38,20 @@ public class ProductServiceImpl implements ProductService {
                               BigDecimal price,
                               int inventory,
                               Long categoryId,
+                              Long sizeId,
                               MultipartFile[] images) throws IOException {
         Product product = new Product();
         product.setName(name);
         product.setBrand(brand);
         product.setDescription(description);
         product.setPrice(price);
-        product.setInventory(inventory);
+//        product.setInventory(inventory);
+
+        Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+        size.setQuantity(inventory);
+        product.setSize(Set.of(size));
+        size.setProduct(product);
+        sizeRepository.save(size);
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         product.setCategory(category);
@@ -90,7 +101,8 @@ public class ProductServiceImpl implements ProductService {
                                  String description,
                                  BigDecimal price,
                                  int inventory,
-                                 Long categoryId
+                                 Long categoryId,
+                                 Long sizeId
                                  ) throws IOException {
         Product updatingProduct = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -99,29 +111,18 @@ public class ProductServiceImpl implements ProductService {
             updatingProduct.setBrand(brand);
             updatingProduct.setDescription(description);
             updatingProduct.setPrice(price);
-            updatingProduct.setInventory(inventory);
+//            updatingProduct.setInventory(inventory);
+            Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+            size.setQuantity(inventory);
+            updatingProduct.setSize(Set.of(size));
+            size.setProduct(updatingProduct);
+            sizeRepository.save(size);
 
             Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
             updatingProduct.setCategory(category);
 
-//            List<ProductImages> listImages = new ArrayList<>();
-//
-//            for (MultipartFile image: images){
-//                Map r = cloudinaryService.upload(image);
-//                String url = (String) r.get("url");
-//
-//                ProductImages productImages = new ProductImages();
-//
-//                productImages.setUrl(url);
-//                productImages.setProduct(updatingProduct);
-//                listImages.add(productImages);
-//            }
-//            updatingProduct.setImages(listImages);
             productRepository.save(updatingProduct);
 
-//            for (ProductImages productImages: listImages){
-//                productImagesRepository.save(productImages);
-//            }
 
             return updatingProduct;
     }

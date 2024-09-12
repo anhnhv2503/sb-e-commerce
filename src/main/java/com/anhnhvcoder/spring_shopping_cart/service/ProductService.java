@@ -16,6 +16,7 @@ public interface ProductService {
                        BigDecimal price,
                        int inventory,
                        Long categoryId,
+                       Long sizeId,
                        MultipartFile[] images) throws IOException;
 
     List<Product> getAllProducts();
@@ -30,7 +31,9 @@ public interface ProductService {
                           String description,
                           BigDecimal price,
                           int inventory,
-                          Long categoryId) throws IOException;
+                          Long categoryId,
+                          Long sizeId
+    ) throws IOException;
 
     List<Product> findByBrand(String brand);
 

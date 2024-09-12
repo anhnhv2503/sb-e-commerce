@@ -30,11 +30,12 @@ public class AuthenticationController {
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtUtils.generateTokenForUser(authentication);
+            String refreshToken = jwtUtils.generateRefreshToken(authentication);
             boolean isValid = jwtUtils.verifyToken(token);
 
-            return ResponseEntity.ok(new AuthenticationResponse(isValid, token, "Login successful"));
+            return ResponseEntity.ok(new AuthenticationResponse(isValid, "Login successful", token, refreshToken));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(false, null, "Invalid email or password"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(false, "Invalid email or password", null, null));
         }
     }
 }

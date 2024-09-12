@@ -7,38 +7,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Entity
+@Table(name = "size")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class OrderItem {
+public class Size {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String sizeName;
     private int quantity;
-    private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 
-    @ManyToOne()
-    @JoinColumn(name = "size_id")
-    private Size size;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id")
+    @OneToOne(mappedBy = "size", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonIgnore
-    private Order order;
+    private CartItem cartItem;
 
-    public OrderItem(int quantity, BigDecimal price, Product product, Order order) {
-        this.quantity = quantity;
-        this.price = price;
-        this.product = product;
-        this.order = order;
-    }
 }
