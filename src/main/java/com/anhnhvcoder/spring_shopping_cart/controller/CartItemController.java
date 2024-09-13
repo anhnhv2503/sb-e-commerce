@@ -27,12 +27,13 @@ public class CartItemController {
 
     @PostMapping("/item/add")
     public ResponseEntity<ApiResponse> addItemToCart(@RequestParam("productId") Long productId,
-                                                     @RequestParam("quantity") int quantity){
+                                                     @RequestParam("quantity") int quantity,
+                                                     @RequestParam("sizeId") Long sizeId){
         try {
             User user = userService.getAuthenticatedUser();
             Cart cart = cartService.initializeNewCart(user);
 
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartItemService.addItemToCart(cart.getId(), productId, quantity)));
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartItemService.addItemToCart(cart.getId(), productId, quantity, sizeId)));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }catch (JwtException e){

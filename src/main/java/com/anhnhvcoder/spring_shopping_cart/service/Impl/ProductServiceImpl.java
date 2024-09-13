@@ -38,20 +38,20 @@ public class ProductServiceImpl implements ProductService {
                               BigDecimal price,
                               int inventory,
                               Long categoryId,
-                              Long sizeId,
+                              String sizeName,
                               MultipartFile[] images) throws IOException {
         Product product = new Product();
         product.setName(name);
         product.setBrand(brand);
         product.setDescription(description);
         product.setPrice(price);
-//        product.setInventory(inventory);
 
-        Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+        Size size = new Size();
+        size.setSizeName(sizeName);
         size.setQuantity(inventory);
         product.setSize(Set.of(size));
         size.setProduct(product);
-        sizeRepository.save(size);
+
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         product.setCategory(category);
@@ -69,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
         }
         product.setImages(listImages);
         productRepository.save(product);
+        sizeRepository.save(size);
 
         for (ProductImages productImages: listImages){
             productImagesRepository.save(productImages);
@@ -111,7 +112,7 @@ public class ProductServiceImpl implements ProductService {
             updatingProduct.setBrand(brand);
             updatingProduct.setDescription(description);
             updatingProduct.setPrice(price);
-//            updatingProduct.setInventory(inventory);
+
             Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
             size.setQuantity(inventory);
             updatingProduct.setSize(Set.of(size));
@@ -140,6 +141,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Long countProducts() {
         return productRepository.count();
+    }
+
+    @Override
+    public Size addMoreSize(Long productId, String sizeName, int quantity) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Size size = new Size();
+        size.setSizeName(sizeName);
+        size.setQuantity(quantity);
+        size.setProduct(product);
+        sizeRepository.save(size);
+        return size;
     }
 
 }

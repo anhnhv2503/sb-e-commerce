@@ -38,4 +38,5 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse(false, "Invalid email or password", null, null));
         }
     }
+
 }

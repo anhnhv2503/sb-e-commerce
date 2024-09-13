@@ -2,6 +2,7 @@ package com.anhnhvcoder.spring_shopping_cart.service;
 
 import com.anhnhvcoder.spring_shopping_cart.model.Product;
 import com.anhnhvcoder.spring_shopping_cart.model.ProductImages;
+import com.anhnhvcoder.spring_shopping_cart.model.Size;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public interface ProductService {
                        BigDecimal price,
                        int inventory,
                        Long categoryId,
-                       Long sizeId,
+                       String sizeName,
                        MultipartFile[] images) throws IOException;
 
     List<Product> getAllProducts();
@@ -40,5 +41,7 @@ public interface ProductService {
     List<Product> findByCategory(Long categoryId);
 
     Long countProducts();
+
+    Size addMoreSize(Long productId, String sizeName, int quantity);
 
 }

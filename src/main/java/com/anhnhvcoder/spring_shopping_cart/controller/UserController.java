@@ -25,6 +25,16 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED.value(), userService.registerUser(fullName, phone, email, password, address)));
     }
 
+    @PostMapping("/admin/register")
+    public ResponseEntity<ApiResponse> registerAdmin(@RequestParam String fullName,
+                                                    @RequestParam String phone,
+                                                    @RequestParam String email,
+                                                    @RequestParam String password,
+                                                    @RequestParam String address){
+
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED.value(), userService.registerAdmin(fullName, phone, email, password, address)));
+    }
+
     @GetMapping("/{userId}/detail")
     public ResponseEntity<ApiResponse> getUserById(@PathVariable Long userId){
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.getUserById(userId)));

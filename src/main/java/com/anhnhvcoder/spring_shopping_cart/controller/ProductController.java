@@ -1,6 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.controller;
 
 import com.anhnhvcoder.spring_shopping_cart.model.Product;
+import com.anhnhvcoder.spring_shopping_cart.model.Size;
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
 import com.anhnhvcoder.spring_shopping_cart.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,22 @@ public class ProductController {
                                                   @RequestParam("price") BigDecimal price,
                                                   @RequestParam("inventory") int inventory,
                                                   @RequestParam("categoryId") Long categoryId,
-                                                  @RequestParam("sizeId") Long sizeId,
+                                                  @RequestParam("sizeName") String sizeName,
                                                   @RequestParam("images") MultipartFile[] images) throws IOException {
-        Product product = productService.addProduct(name, brand, description, price, inventory, categoryId, sizeId, images);
+        Product product = productService.addProduct(name, brand, description, price, inventory, categoryId, sizeName, images);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), product);
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/size/add/{productId}")
+    public ResponseEntity<ApiResponse> addMoreSize(@PathVariable("productId") Long productId,
+                                                   @RequestParam("sizeName") String sizeName,
+                                                   @RequestParam("quantity") int quantity){
+
+        Size size = productService.addMoreSize(productId, sizeName, quantity);
+
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), size));
     }
 
     @GetMapping("/all")

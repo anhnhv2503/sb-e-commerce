@@ -30,12 +30,12 @@ public class UserServiceImpl implements UserService {
         if (!phone.matches(phoneRegex)) {
             throw new RuntimeException("Invalid phone number. It should contain 10 digits.");
         }
-        if(userRepository.findByPhone(phone) != null){
+        if (userRepository.findByPhone(phone) != null) {
             throw new AlreadyExistedException("Phone number is already registered");
         }
-        if(userRepository.findByEmail(email) != null){
+        if (userRepository.findByEmail(email) != null) {
             throw new AlreadyExistedException("Email is already registered");
-        }else{
+        } else {
             User user = new User();
             user.setFullName(fullName);
             user.setPhone(phone);
@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
             user.setAddress(address);
             Role userRole = roleRepository.findByRoleName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
             user.setRoles(Set.of(userRole));
-//            user.setRoles;
             return userRepository.save(user);
         }
     }
@@ -64,5 +63,29 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User registerAdmin(String fullName, String phone, String email, String password, String address) {
+        String phoneRegex = "^[0-9]{10}$";
+        if (!phone.matches(phoneRegex)) {
+            throw new RuntimeException("Invalid phone number. It should contain 10 digits.");
+        }
+        if (userRepository.findByPhone(phone) != null) {
+            throw new AlreadyExistedException("Phone number is already registered");
+        }
+        if (userRepository.findByEmail(email) != null) {
+            throw new AlreadyExistedException("Email is already registered");
+        } else {
+            User admin = new User();
+            admin.setFullName(fullName);
+            admin.setPhone(phone);
+            admin.setEmail(email);
+            admin.setPassword(passwordEncoder.encode(password));
+            admin.setAddress(address);
+            Role adminRole = roleRepository.findByRoleName("ROLE_ADMIN").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+            admin.setRoles(Set.of(adminRole));
+            return userRepository.save(admin);
+        }
     }
 }

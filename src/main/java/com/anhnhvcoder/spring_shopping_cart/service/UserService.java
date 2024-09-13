@@ -11,4 +11,6 @@ public interface UserService {
     User getUserById(Long id);
 
     User getAuthenticatedUser();
+
+    User registerAdmin(String fullName, String phone, String email, String password, String address);
 }
