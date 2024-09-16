@@ -102,4 +102,10 @@ public class ProductController {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.countProducts());
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/new-arrival")
+    public ResponseEntity<ApiResponse> getNewestProducts(){
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.getNewArrivalProducts());
+        return ResponseEntity.ok(apiResponse);
+    }
 }

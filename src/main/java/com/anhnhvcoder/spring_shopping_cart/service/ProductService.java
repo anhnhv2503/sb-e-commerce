@@ -44,4 +44,6 @@ public interface ProductService {
 
     Size addMoreSize(Long productId, String sizeName, int quantity);
 
+    List<Product> getNewArrivalProducts();
+
 }
