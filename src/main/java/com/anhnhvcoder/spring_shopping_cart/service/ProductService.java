@@ -46,4 +46,8 @@ public interface ProductService {
 
     List<Product> getNewArrivalProducts();
 
+    List<Product> getProductByName(String name);
+
+    List<String> getAllDistinctBrand();
+
 }

@@ -108,4 +108,16 @@ public class ProductController {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.getNewArrivalProducts());
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> searchProductByName(@RequestParam(value = "name", required = false) String name){
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.getProductByName(name));
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/brand/all")
+    public ResponseEntity<ApiResponse> getAllProductBrand(){
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.getAllDistinctBrand());
+        return ResponseEntity.ok(apiResponse);
+    }
 }

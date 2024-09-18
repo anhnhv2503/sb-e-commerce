@@ -160,4 +160,15 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAllByOrderByIdDesc(Pageable.ofSize(8));
     }
 
+    @Override
+    public List<Product> getProductByName(String name) {
+        return productRepository.findByName(name);
+    }
+
+    @Override
+    public List<String> getAllDistinctBrand() {
+        return productRepository.findDistinctBrand();
+    }
+
+
 }
