@@ -120,4 +120,10 @@ public class ProductController {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.getAllDistinctBrand());
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/size/inventory/{sizeId}")
+    public ResponseEntity<?> getSizeInventory(@PathVariable("sizeId") Long sizeId){
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.getInventoryBySizeId(sizeId));
+        return ResponseEntity.ok(apiResponse);
+    }
 }

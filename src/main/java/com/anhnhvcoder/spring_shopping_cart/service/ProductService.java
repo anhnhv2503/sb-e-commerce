@@ -50,4 +50,6 @@ public interface ProductService {
 
     List<String> getAllDistinctBrand();
 
+    int getInventoryBySizeId(Long sizeId);
+
 }

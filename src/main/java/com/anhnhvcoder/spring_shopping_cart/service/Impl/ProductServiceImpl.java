@@ -176,5 +176,11 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findDistinctBrand();
     }
 
+    @Override
+    public int getInventoryBySizeId(Long sizeId) {
+        Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+        return size.getQuantity();
+    }
+
 
 }
