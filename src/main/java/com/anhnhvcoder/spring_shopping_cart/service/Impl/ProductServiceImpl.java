@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
+import com.anhnhvcoder.spring_shopping_cart.exception.AlreadyExistedException;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.Category;
 import com.anhnhvcoder.spring_shopping_cart.model.Product;
@@ -147,12 +148,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Size addMoreSize(Long productId, String sizeName, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        Size size = new Size();
-        size.setSizeName(sizeName);
-        size.setQuantity(quantity);
-        size.setProduct(product);
-        sizeRepository.save(size);
-        return size;
+        if(sizeRepository.findBySizeNameAndProductId(sizeName, productId) != null){
+            throw new AlreadyExistedException("Size already exists");
+        }else{
+            Size size = new Size();
+            size.setSizeName(sizeName);
+            size.setQuantity(quantity);
+            size.setProduct(product);
+            sizeRepository.save(size);
+            return size;
+        }
+
     }
 
     @Override

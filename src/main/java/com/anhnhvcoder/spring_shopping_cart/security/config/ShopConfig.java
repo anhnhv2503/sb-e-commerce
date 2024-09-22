@@ -31,7 +31,12 @@ public class ShopConfig {
     private final JwtAuthEntryPoint authEntryPoint;
 
     private static final List<String> SECURED_URLS =
-            List.of("/api/cart/**", "/api/cart-item/**");
+            List.of("/api/cart/**",
+                    "/api/cart-item/**",
+                    "/api/products/add",
+                    "/api/products/size/add/{productId}",
+                    "/api/products/{id}/delete",
+                    "/api/products/{id}/update");
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -66,6 +71,13 @@ public class ShopConfig {
                         .anyRequest().permitAll());
         http.authenticationProvider(daoAuthenticationProvider());
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(request -> {
+            var cors = new org.springframework.web.cors.CorsConfiguration();
+            cors.setAllowedOrigins(List.of("*"));
+            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+            cors.setAllowedHeaders(List.of("*"));
+            return cors;
+        }));
         return http.build();
     }
 }
