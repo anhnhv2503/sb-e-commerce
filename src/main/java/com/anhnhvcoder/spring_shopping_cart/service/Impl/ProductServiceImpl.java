@@ -182,5 +182,10 @@ public class ProductServiceImpl implements ProductService {
         return size.getQuantity();
     }
 
+    @Override
+    public Size getProductBySizeId(Long sizeId) {
+        return sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+    }
+
 
 }

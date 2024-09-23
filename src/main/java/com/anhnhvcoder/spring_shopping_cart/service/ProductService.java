@@ -52,4 +52,6 @@ public interface ProductService {
 
     int getInventoryBySizeId(Long sizeId);
 
+    Size getProductBySizeId(Long sizeId);
+
 }
