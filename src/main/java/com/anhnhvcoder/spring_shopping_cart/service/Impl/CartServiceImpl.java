@@ -26,7 +26,6 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getCart(Long id) {
         Cart cart = cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-//        Cart cart = getCartByUserId(userId);
 
         BigDecimal totalPrice = cart.getTotalPrice();
         cart.setTotalPrice(totalPrice);

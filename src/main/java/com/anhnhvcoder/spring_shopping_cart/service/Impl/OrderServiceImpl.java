@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
         return cart.getCartItems().stream().map(cartItem -> {
             Product product = cartItem.getProduct();
 
-            Size size = sizeRepository.findBySizeNameAndProductId(cartItem.getSize().getSizeName(), product.getId());
+            Size size = sizeRepository.findBySizeNameAndProductId(cartItem.getSize().getSizeName(), cartItem.getProduct().getId());
             size.setQuantity(size.getQuantity() - cartItem.getQuantity());
             sizeRepository.save(size);
 

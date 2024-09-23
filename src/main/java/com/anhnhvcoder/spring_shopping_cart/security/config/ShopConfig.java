@@ -36,7 +36,8 @@ public class ShopConfig {
                     "/api/products/add",
                     "/api/products/size/add/{productId}",
                     "/api/products/{id}/delete",
-                    "/api/products/{id}/update");
+                    "/api/products/{id}/update",
+                    "/api/order/**");
 
     @Bean
     public PasswordEncoder passwordEncoder(){
