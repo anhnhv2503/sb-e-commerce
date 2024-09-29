@@ -39,4 +39,11 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUserById(@PathVariable Long userId){
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.getUserById(userId)));
     }
+
+    @PatchMapping("/update")
+    public ResponseEntity<ApiResponse> updateUser(@RequestParam String fullName,
+                                                  @RequestParam String phone,
+                                                  @RequestParam String address){
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.updateUser(fullName, phone, address)));
+    }
 }

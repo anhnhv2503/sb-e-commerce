@@ -13,4 +13,6 @@ public interface UserService {
     User getAuthenticatedUser();
 
     User registerAdmin(String fullName, String phone, String email, String password, String address);
+
+    User updateUser(String fullName, String phone, String address);
 }

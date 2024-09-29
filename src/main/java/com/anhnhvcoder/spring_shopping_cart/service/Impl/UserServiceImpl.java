@@ -8,6 +8,7 @@ import com.anhnhvcoder.spring_shopping_cart.repository.RoleRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -87,5 +89,16 @@ public class UserServiceImpl implements UserService {
             admin.setRoles(Set.of(adminRole));
             return userRepository.save(admin);
         }
+    }
+
+    @Override
+    public User updateUser(String fullName, String phone, String address) {
+        User user = getAuthenticatedUser();
+
+        user.setFullName(fullName.trim().length() > 0 ? fullName : user.getFullName());
+        user.setPhone(phone.trim().length() > 0 ? phone : user.getPhone());
+        user.setAddress(address.trim().length() > 0 ? address : user.getAddress());
+        log.info("User: {}", user);
+        return userRepository.save(user);
     }
 }
