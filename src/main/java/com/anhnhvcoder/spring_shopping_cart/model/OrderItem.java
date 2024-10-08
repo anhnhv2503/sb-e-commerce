@@ -35,10 +35,11 @@ public class OrderItem {
     @JsonIgnore
     private Order order;
 
-    public OrderItem(int quantity, BigDecimal price, Product product, Order order) {
+    public OrderItem(int quantity, BigDecimal price, Product product, Order order, Size size) {
         this.quantity = quantity;
         this.price = price;
         this.product = product;
         this.order = order;
+        this.size = size;
     }
 }

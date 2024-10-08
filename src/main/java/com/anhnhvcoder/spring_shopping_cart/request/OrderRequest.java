@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,6 +15,6 @@ import java.util.List;
 @Setter
 public class OrderRequest {
     private BigDecimal totalPrice;
-    private List<OrderItemRequest> items;
+    private Set<OrderItemRequest> items;
 
 }

@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.controller;
 
+import com.anhnhvcoder.spring_shopping_cart.model.Order;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
 import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
@@ -20,7 +21,8 @@ public class OrderController {
 
     @PostMapping("/placeOrder")
     public ResponseEntity<ApiResponse> placeOrder(@RequestBody OrderRequest request){
+        Order order = orderService.placeOrder(request);
 
-        return ResponseEntity.ok(new ApiResponse(1000, request));
+        return ResponseEntity.ok(new ApiResponse(1000, order));
     }
 }
