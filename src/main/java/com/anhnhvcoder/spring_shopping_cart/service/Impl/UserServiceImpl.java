@@ -7,6 +7,7 @@ import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.RoleRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -24,10 +25,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final EmailService emailService;
 
 
     @Override
-    public User registerUser(String fullName, String phone, String email, String password, String address) {
+    public User registerUser(String fullName, String phone, String email, String password, String address) throws MessagingException {
         String phoneRegex = "^[0-9]{10}$";
         if (!phone.matches(phoneRegex)) {
             throw new RuntimeException("Invalid phone number. It should contain 10 digits.");
@@ -46,6 +48,8 @@ public class UserServiceImpl implements UserService {
             user.setAddress(address);
             Role userRole = roleRepository.findByRoleName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
             user.setRoles(Set.of(userRole));
+            user.setActive(false);
+            emailService.sendEmail(email, emailService.subjectRegister(), emailService.bodyRegister(email, fullName, phone, address));
             return userRepository.save(user);
         }
     }

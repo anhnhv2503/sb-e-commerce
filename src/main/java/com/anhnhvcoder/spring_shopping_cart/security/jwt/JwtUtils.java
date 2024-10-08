@@ -1,10 +1,13 @@
 package com.anhnhvcoder.spring_shopping_cart.security.jwt;
 
+import com.anhnhvcoder.spring_shopping_cart.model.User;
+import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
 import com.anhnhvcoder.spring_shopping_cart.security.user.ShopUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +24,8 @@ public class JwtUtils {
     private String jwtSecret;
     @Value("${jwt.expiration}")
     private int expirationTime;
+    @Autowired
+    private UserRepository userRepository;
 
     public String generateTokenForUser(Authentication authentication) {
         ShopUserDetails userPrincipal = (ShopUserDetails) authentication.getPrincipal();
@@ -33,7 +38,6 @@ public class JwtUtils {
                 .claim("roles", roles)
                 .claim("username", userPrincipal.getUsername())
                 .setIssuedAt(new Date())
-//                .setExpiration(new Date(new Date().getTime() + 900000))
                 .setExpiration(new Date(new Date().getTime() + expirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
@@ -55,6 +59,17 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateVerifyEmailToken(String email) {
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + 24 * 60 * 60 * 1000))
+                .claim("email", email)
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     private Key key(){
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
@@ -65,6 +80,14 @@ public class JwtUtils {
                 .build()
                 .parseClaimsJws(token)
                 .getBody().getSubject();
+    }
+
+    public Date getExpDateFromToken(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody().getExpiration();
     }
 
     public boolean verifyToken(String token){

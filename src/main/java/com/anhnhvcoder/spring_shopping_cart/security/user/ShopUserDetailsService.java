@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.security.user;
 
+import com.anhnhvcoder.spring_shopping_cart.exception.InactiveUserException;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
@@ -21,6 +22,9 @@ public class ShopUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = Optional.ofNullable(userRepository.findByEmail(email))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if(!user.isActive()){
+            throw new InactiveUserException("Account is not activated yet! Please check your email to activate your account.");
+        }
         return ShopUserDetails.buildUserDetails(user);
     }
 }

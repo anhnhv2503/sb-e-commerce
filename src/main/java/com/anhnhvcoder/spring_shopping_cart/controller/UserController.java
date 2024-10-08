@@ -2,6 +2,7 @@ package com.anhnhvcoder.spring_shopping_cart.controller;
 
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UserController {
                                                     @RequestParam String phone,
                                                     @RequestParam String email,
                                                     @RequestParam String password,
-                                                    @RequestParam String address){
+                                                    @RequestParam String address) throws MessagingException {
 
         return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED.value(), userService.registerUser(fullName, phone, email, password, address)));
     }

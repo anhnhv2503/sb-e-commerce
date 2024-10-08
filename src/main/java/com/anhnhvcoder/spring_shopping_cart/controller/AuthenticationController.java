@@ -35,7 +35,7 @@ public class AuthenticationController {
 
             return ResponseEntity.ok(new AuthenticationResponse(isValid, "Login successful", token, refreshToken));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthenticationResponse(false, "Invalid email or password", null, null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthenticationResponse(false, e.getMessage(), null, null));
         }
     }
 
