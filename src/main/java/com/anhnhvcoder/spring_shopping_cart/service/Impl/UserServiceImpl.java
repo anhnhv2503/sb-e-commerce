@@ -105,4 +105,14 @@ public class UserServiceImpl implements UserService {
         log.info("User: {}", user);
         return userRepository.save(user);
     }
+
+    @Override
+    public User changePassword(String oldPassword, String newPassword) {
+        User user = getAuthenticatedUser();
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            return userRepository.save(user);
+        }
+        throw new ResourceNotFoundException("Old password is incorrect");
+    }
 }

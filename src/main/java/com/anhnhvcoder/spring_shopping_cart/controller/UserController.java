@@ -41,10 +41,20 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.getUserById(userId)));
     }
 
-    @PatchMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateUser(@RequestParam String fullName,
                                                   @RequestParam String phone,
                                                   @RequestParam String address){
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.updateUser(fullName, phone, address)));
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<ApiResponse> changePassword(@RequestParam String oldPassword,
+                                                      @RequestParam String newPassword){
+        try {
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.changePassword(oldPassword, newPassword)));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        }
     }
 }
