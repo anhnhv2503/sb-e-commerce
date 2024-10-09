@@ -2,10 +2,13 @@ package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
 import com.anhnhvcoder.spring_shopping_cart.exception.AlreadyExistedException;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
+import com.anhnhvcoder.spring_shopping_cart.exception.TokenExpiredException;
 import com.anhnhvcoder.spring_shopping_cart.model.Role;
 import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.RoleRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
+import com.anhnhvcoder.spring_shopping_cart.request.ResetPasswordRequest;
+import com.anhnhvcoder.spring_shopping_cart.security.jwt.JwtUtils;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Set;
 
 @Service
@@ -26,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final EmailService emailService;
+    private final JwtUtils jwtUtils;
 
 
     @Override
@@ -46,10 +51,15 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email);
             user.setPassword(passwordEncoder.encode(password));
             user.setAddress(address);
-            Role userRole = roleRepository.findByRoleName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+            Role userRole = roleRepository.findByRoleName("ROLE_USER")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
             user.setRoles(Set.of(userRole));
             user.setActive(false);
-            emailService.sendEmail(email, emailService.subjectRegister(), emailService.bodyRegister(email, fullName, phone, address));
+            emailService.sendEmail(
+                    email,
+                    emailService.subjectRegister(),
+                    emailService.bodyRegister(email, fullName, phone, address)
+            );
             return userRepository.save(user);
         }
     }
@@ -61,7 +71,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
@@ -89,7 +100,8 @@ public class UserServiceImpl implements UserService {
             admin.setEmail(email);
             admin.setPassword(passwordEncoder.encode(password));
             admin.setAddress(address);
-            Role adminRole = roleRepository.findByRoleName("ROLE_ADMIN").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+            Role adminRole = roleRepository.findByRoleName("ROLE_ADMIN")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
             admin.setRoles(Set.of(adminRole));
             return userRepository.save(admin);
         }
@@ -114,5 +126,37 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(user);
         }
         throw new ResourceNotFoundException("Old password is incorrect");
+    }
+
+    @Override
+    public User forgotPassword(String email) throws MessagingException {
+        User user = userRepository.findByEmail(email);
+        if(user == null){
+            throw new ResourceNotFoundException("User not found");
+        }else if(!user.isActive()){
+            throw new ResourceNotFoundException("Email is not active");
+        }
+        emailService.sendEmail(
+                email,
+                emailService.subjectResetPassword(),
+                emailService.bodyResetPassword(email));
+
+        return user;
+    }
+
+    @Override
+    public User resetPassword(ResetPasswordRequest request) {
+        String email = jwtUtils.getUsernameFromToken(request.getToken());
+        Date expDate = jwtUtils.getExpDateFromToken(request.getToken());
+        if(!expDate.before(new Date())){
+            User user = userRepository.findByEmail(email);
+            if(user == null){
+                throw new ResourceNotFoundException("User not found");
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            return userRepository.save(user);
+        }else{
+            throw new TokenExpiredException("Token expired");
+        }
     }
 }

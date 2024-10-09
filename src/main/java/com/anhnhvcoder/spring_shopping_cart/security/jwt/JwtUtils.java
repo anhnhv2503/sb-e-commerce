@@ -70,6 +70,17 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateResetPasswordToken(String email) {
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + 24 * 60 * 60 * 1000))
+                .claim("email", email)
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     private Key key(){
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }

@@ -1,6 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.service;
 
 import com.anhnhvcoder.spring_shopping_cart.model.User;
+import com.anhnhvcoder.spring_shopping_cart.request.ResetPasswordRequest;
 import jakarta.mail.MessagingException;
 
 public interface UserService {
@@ -18,4 +19,8 @@ public interface UserService {
     User updateUser(String fullName, String phone, String address);
 
     User changePassword(String oldPassword, String newPassword);
+
+    User forgotPassword(String email) throws MessagingException;
+
+    User resetPassword(ResetPasswordRequest request);
 }

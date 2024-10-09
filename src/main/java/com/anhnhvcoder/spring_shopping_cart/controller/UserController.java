@@ -1,5 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.controller;
 
+import com.anhnhvcoder.spring_shopping_cart.model.User;
+import com.anhnhvcoder.spring_shopping_cart.request.ResetPasswordRequest;
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import jakarta.mail.MessagingException;
@@ -56,5 +58,20 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse> forgotPassword(@RequestParam String email) throws MessagingException {
+        try {
+            User user = userService.forgotPassword(email);
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "An email has been sent to " + email + " to reset your password."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse> resetPassword(@RequestBody ResetPasswordRequest request){
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.resetPassword(request)));
     }
 }

@@ -139,8 +139,88 @@ public class EmailService {
         }else{
             throw new TokenExpiredException("Token expired");
         }
-
     }
+    public String subjectResetPassword(){
+        return "Reset Your Password";
+    }
+
+    public String bodyResetPassword(String email){
+        return "<!DOCTYPE html>\n"
+                + "<html lang=\"en\">\n"
+                + "<head>\n"
+                + "  <meta charset=\"utf-8\">\n"
+                + "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n"
+                + "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+                + "  <style>\n"
+                + "    body {\n"
+                + "      font-family: Arial, sans-serif;\n"
+                + "      background-color: #f4f4f4;\n"
+                + "      margin: 0;\n"
+                + "      padding: 0;\n"
+                + "    }\n"
+                + "\n"
+                + "    .email-container {\n"
+                + "      max-width: 600px;\n"
+                + "      margin: 20px auto;\n"
+                + "      background-color: #fff;\n"
+                + "      border-radius: 8px;\n"
+                + "      overflow: hidden;\n"
+                + "      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n"
+                + "    }\n"
+                + "\n"
+                + "    .header {\n"
+                + "      background-color:#ff4545;\n"
+                + "      color: #fff;\n"
+                + "      padding: 20px;\n"
+                + "      text-align: center;\n"
+                + "    }\n"
+                + "\n"
+                + "    .content {\n"
+                + "      padding: 20px;\n"
+                + "    }\n"
+                + "\n"
+                + "    .button{\n" +
+                "        background-color: #ff4545;\n" +
+                "        color: #fff;\n" +
+                "        margin: 24px 24px 24px 24px;\n" +
+                "        padding: 10px 20px;\n" +
+                "        border: none;\n" +
+                "        cursor: pointer;\n" +
+                "        text-decoration: none;\n" +
+                "      }\n"
+                + "\n"
+                + " a {\n" +
+                "        color: #fff;\n" +
+                "      }\n"
+                + "    .footer {\n"
+                + "      background-color: #ff4545;\n"
+                + "      color: #fff;\n"
+                + "      padding: 10px;\n"
+                + "      text-align: center;\n"
+                + "    }\n"
+                + "  </style>\n"
+                + "</head>\n"
+                + "<body>\n"
+                + "  <div class=\"email-container\">\n"
+                + "    <div class=\"header\">\n"
+                + "     <h1>VA SHOP</h1>\n "
+                + "    </div>\n"
+                + "    <div class=\"content\">\n"
+                + "      <h3>Reset Password</h3>\n"
+                + "      <p>Date : " + LocalDate.now() + "</p>\n"
+                + "      <p>This email valid in 24h</p>\n"
+                + "      <p>Contact 0976652503.</p>\n"
+                + "      <a class=\"button\" href=\" " + clientUrl + "forgot/password?token=" + jwtUtils.generateResetPasswordToken(email) + "\">RESET PASSWORD</a>\n"
+                + "      <p>We are ready support</p>\n"
+                + "    </div>\n"
+                + "    <div class=\"footer\">\n"
+                + "      <p>Thanks for Subcribe</p>\n"
+                + "    </div>\n"
+                + "  </div>\n"
+                + "</body>\n"
+                + "</html>";
+    }
+
 
 
 }
