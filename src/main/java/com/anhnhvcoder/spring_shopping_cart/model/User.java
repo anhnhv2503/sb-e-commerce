@@ -15,7 +15,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
 
@@ -37,10 +36,7 @@ public class User {
     private List<Order> order;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {
-            CascadeType.PERSIST,
             CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.DETACH
     })
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
