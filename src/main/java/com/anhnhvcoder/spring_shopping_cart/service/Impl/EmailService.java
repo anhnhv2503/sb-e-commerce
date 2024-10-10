@@ -210,7 +210,7 @@ public class EmailService {
                 + "      <p>Date : " + LocalDate.now() + "</p>\n"
                 + "      <p>This email valid in 24h</p>\n"
                 + "      <p>Contact 0976652503.</p>\n"
-                + "      <a class=\"button\" href=\" " + clientUrl + "forgot/password?token=" + jwtUtils.generateResetPasswordToken(email) + "\">RESET PASSWORD</a>\n"
+                + "      <a class=\"button\" href=\" " + clientUrl + "reset/password?token=" + jwtUtils.generateResetPasswordToken(email) + "\">RESET PASSWORD</a>\n"
                 + "      <p>We are ready support</p>\n"
                 + "    </div>\n"
                 + "    <div class=\"footer\">\n"
