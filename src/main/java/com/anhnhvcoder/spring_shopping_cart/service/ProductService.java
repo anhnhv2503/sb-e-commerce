@@ -54,4 +54,5 @@ public interface ProductService {
 
     Size getProductBySizeId(Long sizeId);
 
+    Size editSizeInventory(Long sizeId, int quantity);
 }

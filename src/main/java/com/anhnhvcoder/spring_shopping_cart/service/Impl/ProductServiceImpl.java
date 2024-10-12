@@ -187,5 +187,12 @@ public class ProductServiceImpl implements ProductService {
         return sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
     }
 
+    @Override
+    public Size editSizeInventory(Long sizeId, int quantity) {
+        Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+        size.setQuantity(quantity);
+        return sizeRepository.save(size);
+    }
+
 
 }

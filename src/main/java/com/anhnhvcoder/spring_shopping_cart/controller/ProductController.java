@@ -133,4 +133,11 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/size/edit/{sizeId}")
+    public ResponseEntity<?> editSizeInventory(@PathVariable("sizeId") Long sizeId, @RequestParam("quantity") int quantity){
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.editSizeInventory(sizeId, quantity));
+        return ResponseEntity.ok(apiResponse);
+    }
+
 }

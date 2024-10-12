@@ -15,6 +15,7 @@ import java.util.Set;
 @Setter
 public class OrderRequest {
     private BigDecimal totalPrice;
+    private String orderAddress;
     private Set<OrderItemRequest> items;
 
 }

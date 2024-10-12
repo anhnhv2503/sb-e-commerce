@@ -41,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderDate(LocalDate.now());
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(request.getTotalPrice());
+        order.setOrderAddress(request.getOrderAddress());
         order.setUser(user);
 
         Set<OrderItem> orderItems = createOrderItems(request, order);

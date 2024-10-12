@@ -37,6 +37,7 @@ public class ShopConfig {
                     "/api/products/size/add/{productId}",
                     "/api/products/{id}/delete",
                     "/api/products/{id}/update",
+                    "/api/products/size/edit/{sizeId}",
                     "/api/order/**",
                     "/api/user/update",
                     "/api/user/change-password");
