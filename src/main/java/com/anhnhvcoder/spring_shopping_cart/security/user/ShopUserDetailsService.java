@@ -21,7 +21,7 @@ public class ShopUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = Optional.ofNullable(userRepository.findByEmail(email))
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid Email"));
         if(!user.isActive()){
             throw new InactiveUserException("Account is not activated yet! Please check your email to activate your account.");
         }
