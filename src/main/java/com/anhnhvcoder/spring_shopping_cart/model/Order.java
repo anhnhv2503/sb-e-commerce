@@ -1,6 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.model;
 
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
+import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String orderAddress;
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();

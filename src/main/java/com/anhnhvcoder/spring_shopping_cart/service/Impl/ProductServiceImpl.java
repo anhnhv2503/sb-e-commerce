@@ -12,6 +12,7 @@ import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -194,5 +195,8 @@ public class ProductServiceImpl implements ProductService {
         return sizeRepository.save(size);
     }
 
-
+    @Override
+    public Page<Product> getProductsByPage(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
 }

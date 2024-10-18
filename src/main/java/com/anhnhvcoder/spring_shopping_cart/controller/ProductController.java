@@ -5,6 +5,9 @@ import com.anhnhvcoder.spring_shopping_cart.model.Size;
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
 import com.anhnhvcoder.spring_shopping_cart.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -138,6 +141,14 @@ public class ProductController {
     public ResponseEntity<?> editSizeInventory(@PathVariable("sizeId") Long sizeId, @RequestParam("quantity") int quantity){
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.editSizeInventory(sizeId, quantity));
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Product>> getProductsByPage(@RequestParam(name = "page", defaultValue = "0") int page){
+        int size = 5;
+        int pageIndex = page - 1;
+        Pageable pageable = PageRequest.of(pageIndex, size);
+        return ResponseEntity.ok(productService.getProductsByPage(pageable));
     }
 
 }

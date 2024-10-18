@@ -3,6 +3,8 @@ package com.anhnhvcoder.spring_shopping_cart.service;
 import com.anhnhvcoder.spring_shopping_cart.model.Product;
 import com.anhnhvcoder.spring_shopping_cart.model.ProductImages;
 import com.anhnhvcoder.spring_shopping_cart.model.Size;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -55,4 +57,6 @@ public interface ProductService {
     Size getProductBySizeId(Long sizeId);
 
     Size editSizeInventory(Long sizeId, int quantity);
+
+    Page<Product> getProductsByPage(Pageable pageable);
 }
