@@ -17,5 +17,6 @@ public class OrderRequest {
     private BigDecimal totalPrice;
     private String orderAddress;
     private Set<OrderItemRequest> items;
+    private String paymentMethod;
 
 }

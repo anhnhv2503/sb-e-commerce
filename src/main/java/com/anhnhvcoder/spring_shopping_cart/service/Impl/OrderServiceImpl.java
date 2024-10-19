@@ -1,6 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
+import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.*;
 import com.anhnhvcoder.spring_shopping_cart.repository.OrderItemRepository;
@@ -42,11 +43,11 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(request.getTotalPrice());
         order.setOrderAddress(request.getOrderAddress());
+        order.setPaymentType(PaymentType.CASH_ON_DELIVERY);
         order.setUser(user);
 
         Set<OrderItem> orderItems = createOrderItems(request, order);
         order.setOrderItems(orderItems);
-
 
         return orderRepository.save(order);
     }
