@@ -18,7 +18,7 @@ public interface ProductService {
                        String description,
                        BigDecimal price,
                        int inventory,
-                       Long categoryId,
+                       String categoryName,
                        String sizeName,
                        MultipartFile[] images) throws IOException;
 

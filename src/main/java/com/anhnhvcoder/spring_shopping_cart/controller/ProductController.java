@@ -32,10 +32,10 @@ public class ProductController {
                                                   @RequestParam("description") String description,
                                                   @RequestParam("price") BigDecimal price,
                                                   @RequestParam("inventory") int inventory,
-                                                  @RequestParam("categoryId") Long categoryId,
+                                                  @RequestParam("categoryName") String categoryName,
                                                   @RequestParam("sizeName") String sizeName,
                                                   @RequestParam("images") MultipartFile[] images) throws IOException {
-        Product product = productService.addProduct(name, brand, description, price, inventory, categoryId, sizeName, images);
+        Product product = productService.addProduct(name, brand, description, price, inventory, categoryName, sizeName, images);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), product);
         return ResponseEntity.ok(apiResponse);
     }
@@ -144,10 +144,9 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Product>> getProductsByPage(@RequestParam(name = "page", defaultValue = "0") int page){
-        int size = 5;
-        int pageIndex = page - 1;
-        Pageable pageable = PageRequest.of(pageIndex, size);
+    public ResponseEntity<Page<Product>> getProductsByPage(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                           @RequestParam(name = "size") int size){
+        Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(productService.getProductsByPage(pageable));
     }
 

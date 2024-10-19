@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
                               String description,
                               BigDecimal price,
                               int inventory,
-                              Long categoryId,
+                              String categoryName,
                               String sizeName,
                               MultipartFile[] images) throws IOException {
         Product product = new Product();
@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
         size.setProduct(product);
 
 
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        Category category = categoryRepository.findByName(categoryName).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         product.setCategory(category);
 
         List<ProductImages> listImages = new ArrayList<>();
