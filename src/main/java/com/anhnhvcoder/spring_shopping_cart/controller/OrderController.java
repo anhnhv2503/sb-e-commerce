@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.controller;
 
+import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.model.Order;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
@@ -8,7 +9,7 @@ import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,5 +38,30 @@ public class OrderController {
             return ResponseEntity.ok(new ApiResponse(1000, vnPayService.createVNPayPayment(request, httpServletRequest)));
         }
         return ResponseEntity.badRequest().body(new ApiResponse(1001, "Payment method not supported yet"));
+    }
+
+    @PostMapping("/vnpay-callback")
+    public ResponseEntity<?> vnPayCallback(@RequestBody OrderRequest request, HttpServletRequest httpServletRequest){
+        String vnp_ResponseCode = httpServletRequest.getParameter("vnp_ResponseCode");
+        if(vnp_ResponseCode.equals("00")){
+            return ResponseEntity.ok(new ApiResponse(1000, orderService.placeOrder(request)));
+        }else{
+            return ResponseEntity.badRequest().body(new ApiResponse(1001, "Payment failed"));
+        }
+    }
+
+    @GetMapping("/my-orders")
+    public ResponseEntity<ApiResponse> getOrdersByUserId(@RequestParam OrderStatus status){
+        return ResponseEntity.ok(new ApiResponse(1000, orderService.getOrdersByUserId(status)));
+    }
+
+    @PutMapping("/cancel-order/{orderId}")
+    public ResponseEntity<ApiResponse> cancelOrder(@PathVariable Long orderId){
+        return ResponseEntity.ok(new ApiResponse(1000, orderService.cancelOrder(orderId)));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam OrderStatus status){
+        return ResponseEntity.ok(orderService.getAllOrders(page, status));
     }
 }

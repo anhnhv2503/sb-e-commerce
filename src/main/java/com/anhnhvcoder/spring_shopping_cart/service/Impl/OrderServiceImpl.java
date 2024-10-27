@@ -14,6 +14,9 @@ import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +46,13 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(request.getTotalPrice());
         order.setOrderAddress(request.getOrderAddress());
-        order.setPaymentType(PaymentType.CASH_ON_DELIVERY);
+        if(request.getPaymentMethod().equals("vnpay")){
+            order.setPaymentType(PaymentType.VNPAY);
+        }else if(request.getPaymentMethod().equals("cod")) {
+            order.setPaymentType(PaymentType.CASH_ON_DELIVERY);
+        }else {
+            throw new ResourceNotFoundException("Payment method not supported yet");
+        }
         order.setUser(user);
 
         Set<OrderItem> orderItems = createOrderItems(request, order);
@@ -73,8 +82,30 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
     }
 
-    public List<Order> getOrdersByUserId(Long userId) {
-        return orderRepository.findByUserId(userId);
+    @Override
+    public List<Order> getOrdersByUserId(OrderStatus status) {
+        User user = userService.getAuthenticatedUser();
+        return orderRepository.findByUserIdAndStatus(user.getId(), status);
     }
+
+    @Override
+    public Order cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        order.setStatus(OrderStatus.CANCELLED);
+        order.getOrderItems().stream().map((item) -> {
+            Size size = item.getSize();
+            size.setQuantity(size.getQuantity() + item.getQuantity());
+            sizeRepository.save(size);
+            return item;
+        }).collect(Collectors.toSet());
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public Page<Order> getAllOrders(int page, OrderStatus status) {
+        Pageable pageable = PageRequest.of(page, 7);
+        return orderRepository.findByStatusOrderByOrderDateDesc(pageable, status);
+    }
+
 
 }
