@@ -107,5 +107,28 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByStatusOrderByOrderDateDesc(pageable, status);
     }
 
+    @Override
+    public Order updateOrderStatus(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        if(order.getStatus().equals(OrderStatus.PENDING)) {
+            order.setStatus(OrderStatus.IN_PROGRESS);
+        }else if(order.getStatus().equals(OrderStatus.IN_PROGRESS)){
+            order.setStatus(OrderStatus.SHIPPING);
+        }else{
+            throw new ResourceNotFoundException("Order status can not be updated");
+        }
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public Order confirmDelivered(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        if(order.getStatus().equals(OrderStatus.SHIPPING)){
+            order.setStatus(OrderStatus.DELIVERED);
+            return orderRepository.save(order);
+        }
+        throw new ResourceNotFoundException("Order status can not be updated");
+    }
+
 
 }

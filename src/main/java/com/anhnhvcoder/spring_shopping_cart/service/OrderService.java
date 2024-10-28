@@ -18,4 +18,8 @@ public interface OrderService {
     Order cancelOrder(Long orderId);
 
     Page<Order> getAllOrders(int page, OrderStatus status);
+
+    Order updateOrderStatus(Long orderId);
+
+    Order confirmDelivered(Long orderId);
 }

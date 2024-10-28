@@ -64,4 +64,15 @@ public class OrderController {
     public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam OrderStatus status){
         return ResponseEntity.ok(orderService.getAllOrders(page, status));
     }
+
+    @PutMapping("/update-order-status/{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId){
+        return ResponseEntity.ok(new ApiResponse(1000, orderService.updateOrderStatus(orderId)));
+    }
+
+    @PutMapping("/confirm-delivered/{orderId}")
+    public ResponseEntity<?> confirmDelivered(@PathVariable Long orderId){
+        return ResponseEntity.ok(new ApiResponse(1000, orderService.confirmDelivered(orderId)));
+    }
+
 }
