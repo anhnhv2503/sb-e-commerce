@@ -4,6 +4,7 @@ import com.anhnhvcoder.spring_shopping_cart.utils.VNPayUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import java.text.SimpleDateFormat;
@@ -18,9 +19,11 @@ public class VNPayConfig {
 
     @Getter
     String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    String vnp_TmnCode = "EZP507AR";
+    @Value("${vnpay.tmnCode}")
+    String vnp_TmnCode ;
     @Getter
-    String secretKey = "LZECX3PRZ6SZIVO34ZZEF0ZXYWUKPXUJ";
+    @Value("${vnpay.vnpay.secretKey}")
+    String secretKey;
     String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     String vnp_ReturnUrl = "http://localhost:5173/payment-callback";
     String version = "2.1.0";
