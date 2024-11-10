@@ -22,7 +22,7 @@ public class VNPayConfig {
     @Value("${vnpay.tmnCode}")
     String vnp_TmnCode ;
     @Getter
-    @Value("${vnpay.vnpay.secretKey}")
+    @Value("${vnpay.secretKey}")
     String secretKey;
     String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     String vnp_ReturnUrl = "http://localhost:5173/payment-callback";
