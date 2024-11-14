@@ -27,4 +27,13 @@ public class DashboardController {
                 .data(dashboardService.getDashboardData())
                 .build());
     }
+
+    @GetMapping("/chart")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse> getChart() {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .status(200)
+                .data(dashboardService.getChart())
+                .build());
+    }
 }

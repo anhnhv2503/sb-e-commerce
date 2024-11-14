@@ -1,15 +1,14 @@
 package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
-import com.anhnhvcoder.spring_shopping_cart.repository.CategoryRepository;
-import com.anhnhvcoder.spring_shopping_cart.repository.OrderRepository;
-import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
-import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
+import com.anhnhvcoder.spring_shopping_cart.repository.*;
+import com.anhnhvcoder.spring_shopping_cart.response.ChartResponse;
 import com.anhnhvcoder.spring_shopping_cart.response.DashboardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +18,7 @@ public class DashboardService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public DashboardResponse getDashboardData() {
 
@@ -35,5 +35,9 @@ public class DashboardService {
                .totalProducts(totalProducts)
                 .totalRevenue(totalRevenue)
                .build();
+    }
+
+    public List<ChartResponse> getChart() {
+        return orderItemRepository.findCategoryCounts();
     }
 }
