@@ -24,5 +24,35 @@ This project is upgrade from PRJ301 Project which was developed with Java JSP/Se
    + Total order
    + Quantity of customer
  
- ### User UI
- ![](/assets/login.png)
+### User UI
+- Login
+![](/assets/login.png)
+- Register
+![](/assets/register.png)
+- Forgot Password
+![](/assets/forgotpassword.png)
+- Homepage
+![](/assets/homepage1.png)
+![](/assets/homepage2.png)
+- Shopping Screen
+![](/assets/shop.png)
+- Product detail
+![](/assets/productdetail.png)
+![](/assets/productdetai2.png)'
+- Shopping Cart
+![](/assets/cart.png)
+- Profile
+![](/assets/profile.png)
+- User Orders
+![](/assets/userorder.png)
+
+### Admin UI
+- All Product
+![](/assets/products.png)
+- Dashboard
+![](/assets/chart.png)
+- Add new Product
+![](/assets/addproduct.png)
+- Orders
+![](/assets/orders.png)
+![](/assets/orderdetails.png)
