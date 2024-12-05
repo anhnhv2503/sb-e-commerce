@@ -38,7 +38,7 @@ This project is upgrade from PRJ301 Project which was developed with Java JSP/Se
 ![](/assets/shop.png)
 - Product detail
 ![](/assets/productdetail.png)
-![](/assets/productdetai2.png)'
+![](/assets/productdetail2.png)'
 - Shopping Cart
 ![](/assets/cart.png)
 - Profile
