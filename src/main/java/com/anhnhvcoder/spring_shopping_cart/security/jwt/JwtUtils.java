@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.security.jwt;
 
+import com.anhnhvcoder.spring_shopping_cart.model.Role;
 import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
 import com.anhnhvcoder.spring_shopping_cart.security.user.ShopUserDetails;
@@ -37,6 +38,21 @@ public class JwtUtils {
                 .claim("id", userPrincipal.getId())
                 .claim("roles", roles)
                 .claim("username", userPrincipal.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + expirationTime))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateTokenForGoogleUser(User user) {
+
+        List<String> roles = user.getRoles().stream().map(Role::getRoleName).toList();
+
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .claim("id", user.getId())
+                .claim("roles", roles)
+                .claim("username", user.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256)

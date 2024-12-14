@@ -16,6 +16,7 @@ import java.util.Set;
 @Setter
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class User {
 
     @Id

@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByPhone(phone) != null) {
             throw new AlreadyExistedException("Phone number is already registered");
         }
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new AlreadyExistedException("Email is already registered");
         } else {
             User user = new User();
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByPhone(phone) != null) {
             throw new AlreadyExistedException("Phone number is already registered");
         }
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new AlreadyExistedException("Email is already registered");
         } else {
             User admin = new User();
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User forgotPassword(String email) throws MessagingException {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if(user == null){
             throw new ResourceNotFoundException("User not found");
         }else if(!user.isActive()){
@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
         String email = jwtUtils.getUsernameFromToken(request.getToken());
         Date expDate = jwtUtils.getExpDateFromToken(request.getToken());
         if(!expDate.before(new Date())){
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
             if(user == null){
                 throw new ResourceNotFoundException("User not found");
             }

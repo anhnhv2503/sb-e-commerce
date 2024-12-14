@@ -130,7 +130,7 @@ public class EmailService {
 
         Date expDate = jwtUtils.getExpDateFromToken(request.getToken());
         if(!expDate.before(new Date())){
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException("User not found"));
             if(user == null){
                 throw new ResourceNotFoundException("User not found");
             }
