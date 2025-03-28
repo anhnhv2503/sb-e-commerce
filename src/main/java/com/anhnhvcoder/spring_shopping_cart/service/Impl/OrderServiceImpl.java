@@ -4,12 +4,10 @@ import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.*;
-import com.anhnhvcoder.spring_shopping_cart.repository.OrderItemRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.OrderRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
-import com.anhnhvcoder.spring_shopping_cart.service.CartService;
 import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.payos.PayOS;
+import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.ItemData;
+import vn.payos.type.PaymentData;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final SizeRepository sizeRepository;
     private final UserService userService;
+    private final PayOS payOS;
 
     @Transactional
     @Override
@@ -130,5 +133,30 @@ public class OrderServiceImpl implements OrderService {
         throw new ResourceNotFoundException("Order status can not be updated");
     }
 
+    @Override
+    public String createPayOSPayment(double price) throws Exception {
+        String product = "Test";
+        String desc = "Test";
+        String returnUrl = "http://localhost:8080/success";
+        String cancelUrl = "http://localhost:8080/cancel";
+        String currentTimeString = String.valueOf(new Date().getTime());
+        long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
+        ItemData item = ItemData.builder()
+                .name(product)
+                .quantity(1)
+                .price((int)price)
+                .build();
+        PaymentData paymentData = PaymentData.builder()
+                .orderCode(orderCode)
+                .description(desc)
+                .amount((int)price)
+                .description(desc)
+                .returnUrl(returnUrl)
+                .cancelUrl(cancelUrl)
+                .item(item)
+                .build();
 
+        CheckoutResponseData data = payOS.createPaymentLink(paymentData);
+        return data.getCheckoutUrl();
+    }
 }

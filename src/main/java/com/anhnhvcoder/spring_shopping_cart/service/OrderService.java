@@ -22,4 +22,6 @@ public interface OrderService {
     Order updateOrderStatus(Long orderId);
 
     Order confirmDelivered(Long orderId);
+
+    String createPayOSPayment(double price) throws Exception;
 }

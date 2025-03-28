@@ -74,5 +74,4 @@ public class OrderController {
     public ResponseEntity<?> confirmDelivered(@PathVariable Long orderId){
         return ResponseEntity.ok(new ApiResponse(1000, orderService.confirmDelivered(orderId)));
     }
-
 }
