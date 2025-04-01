@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 public interface CartService {
 
     CartDTO getCart();
-    void clearCart(Long id);
-    BigDecimal  getTotalPrice(Long id);
     Cart initializeNewCart(User user);
     Cart getCartByUserId(Long userId);
 }

@@ -24,7 +24,7 @@ public class Cart {
     private Long id;
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
     private int totalItems;
@@ -50,9 +50,4 @@ public class Cart {
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void removeCartItem(CartItem cartItem){
-        this.cartItems.remove(cartItem);
-        cartItem.setCart(null);
-        updateTotalPrice();
-    }
 }

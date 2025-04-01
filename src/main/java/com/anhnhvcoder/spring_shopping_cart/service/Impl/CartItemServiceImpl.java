@@ -4,13 +4,16 @@ import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.Cart;
 import com.anhnhvcoder.spring_shopping_cart.model.CartItem;
 import com.anhnhvcoder.spring_shopping_cart.model.Size;
+import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartItemRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
 import com.anhnhvcoder.spring_shopping_cart.service.CartItemService;
+import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,12 +27,14 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
     private final SizeRepository sizeRepository;
+    private final UserService userService;
 
     @Override
     public Cart addItemToCart(Long cartId, int quantity, Long sizeId) {
         //get cart -> get product -> check if the product already in the cart -> if yes, update quantity - if no add new item
         Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new RuntimeException("Size not found"));
+        if(quantity > size.getQuantity()) throw new ResourceNotFoundException("Quantity is greater than size quantity");
         Optional<CartItem> isPresentItem = cartItemRepository.findBySizeId(sizeId);
         if(isPresentItem.isPresent()) {
             CartItem existingItem = isPresentItem.get();
@@ -56,18 +61,18 @@ public class CartItemServiceImpl implements CartItemService {
         }
     }
 
+    @Transactional
     @Override
-    public void removeItemFromCart(Long cartId, Long productId) {
-
-    }
-
-    @Override
-    public Cart updateItemQuantity(Long cartId, Long productId, int quantity) {
-        return null;
-    }
-
-    @Override
-    public List<CartItem> getCartItems(Long cartId) {
-        return cartItemRepository.findByCartId(cartId);
+    public void removeItemFromCart(Long itemId) {
+        User user = userService.getAuthenticatedUser();
+        CartItem cartItem = cartItemRepository.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
+        Cart cart = cartRepository.findById(cartItem.getCart().getId()).orElseThrow(() -> new RuntimeException("Cart not found"));
+        if(!user.getId().equals(cart.getUser().getId())) throw new ResourceNotFoundException("You do not have permission to delete this item");
+        cart.getCartItems().remove(cartItem);
+        cartItem.setCart(null);
+        cart.setTotalItems(cart.getCartItems().size());
+        cart.updateTotalPrice();
+        cartItemRepository.delete(cartItem);
+        cartRepository.save(cart);
     }
 }

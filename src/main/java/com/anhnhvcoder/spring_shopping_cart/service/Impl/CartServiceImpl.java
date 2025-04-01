@@ -34,23 +34,6 @@ public class CartServiceImpl implements CartService {
         return cartMapper.toCartDTO(cart);
     }
 
-    @Transactional
-    @Override
-    public void clearCart(Long id) {
-//        Cart cart = getCart(id);
-//        cartItemRepository.deleteAllByCartId(cart.getId());
-//        cart.getCartItems().clear();
-//        cartRepository.deleteById(id);
-//        cart.setTotalPrice(BigDecimal.ZERO);
-//        cart.setTotalItems(0);
-    }
-
-    @Override
-    public BigDecimal getTotalPrice(Long id) {
-//        Cart cart = getCart(id);
-//        return cart.getTotalPrice();
-        return null;
-    }
 
     @Override
     public Cart initializeNewCart(User user) {

@@ -29,35 +29,4 @@ public class CartController {
         }
     }
 
-    @GetMapping("/detail/{userId}")
-    public ResponseEntity<ApiResponse> getCartByUserId(@PathVariable("userId") Long userId){
-        try {
-            Cart cart = cartService.getCartByUserId(userId);
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cart));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/{cartId}/clear-cart")
-    public ResponseEntity<ApiResponse> clearCart(@PathVariable("cartId") Long cartId){
-        try {
-            cartService.clearCart(cartId);
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Cart is cleared"));
-        }catch (ResourceNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
-        }
-
-    }
-
-    @GetMapping("/{cartId}/total-amount")
-    public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable("cartId") Long cartId){
-        try {
-            BigDecimal totalPrice = cartService.getTotalPrice(cartId);
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), totalPrice));
-        }catch (ResourceNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
-        }
-    }
-
 }

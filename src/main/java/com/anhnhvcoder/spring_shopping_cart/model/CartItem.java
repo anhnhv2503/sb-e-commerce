@@ -22,7 +22,7 @@ public class CartItem {
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Size size;
 
     @ManyToOne(cascade = CascadeType.ALL)

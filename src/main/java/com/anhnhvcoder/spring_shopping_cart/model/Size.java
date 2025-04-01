@@ -25,7 +25,7 @@ public class Size {
     @JsonIgnore
     private Product product;
 
-    @OneToOne(mappedBy = "size", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @ManyToOne
     @JsonIgnore
     private CartItem cartItem;
 
