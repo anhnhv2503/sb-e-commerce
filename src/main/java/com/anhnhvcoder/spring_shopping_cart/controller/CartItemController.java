@@ -2,6 +2,7 @@ package com.anhnhvcoder.spring_shopping_cart.controller;
 
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.Cart;
+import com.anhnhvcoder.spring_shopping_cart.model.CartItem;
 import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartItemRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.UserRepository;
@@ -26,14 +27,13 @@ public class CartItemController {
     private final UserService userService;
 
     @PostMapping("/item/add")
-    public ResponseEntity<ApiResponse> addItemToCart(@RequestParam("productId") Long productId,
-                                                     @RequestParam("quantity") int quantity,
+    public ResponseEntity<ApiResponse> addItemToCart(@RequestParam("quantity") int quantity,
                                                      @RequestParam("sizeId") Long sizeId){
         try {
             User user = userService.getAuthenticatedUser();
             Cart cart = cartService.initializeNewCart(user);
 
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartItemService.addItemToCart(cart.getId(), productId, quantity, sizeId)));
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartItemService.addItemToCart(cart.getId(), quantity, sizeId)));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }catch (JwtException e){

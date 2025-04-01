@@ -20,11 +20,10 @@ public class CartController {
 
     private final CartService cartService;
 
-    @GetMapping("/{cartId}/my-cart")
-    public ResponseEntity<ApiResponse> getCart(@PathVariable("cartId") Long cartId){
+    @GetMapping("/my-cart")
+    public ResponseEntity<ApiResponse> getCart(){
         try {
-            Cart cart = cartService.getCart(cartId);
-            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cart));
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartService.getCart()));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }

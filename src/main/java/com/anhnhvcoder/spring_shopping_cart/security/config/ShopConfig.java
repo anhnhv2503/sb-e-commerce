@@ -43,7 +43,8 @@ public class ShopConfig {
                     "/api/user/change-password",
                     "/api/categories/add",
                     "/api/categories/{id}/delete",
-                    "/api/dashboard/**");
+                    "/api/dashboard/**",
+                    "/api/cart/my-cart");
 
     @Bean
     public PasswordEncoder passwordEncoder(){
