@@ -2,6 +2,7 @@ package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
 import com.anhnhvcoder.spring_shopping_cart.dto.PaymentDTO;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
+import com.anhnhvcoder.spring_shopping_cart.enums.PaymentStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.*;
@@ -84,11 +85,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrder(Long orderId) {
-        return orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-    }
-
-    @Override
     public List<Order> getOrdersByUserId(OrderStatus status) {
         User user = userService.getAuthenticatedUser();
         return orderRepository.findByUserIdAndStatus(user.getId(), status);
@@ -143,9 +139,9 @@ public class OrderServiceImpl implements OrderService {
         String currentTimeString = String.valueOf(new Date().getTime());
         long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
         String product = "VA Shop";
-        String desc = "Thanh toán đơn hàng " + user.getFullName() + "-" + orderCode;
-        String returnUrl = "http://localhost:5713/payos/success";
-        String cancelUrl = "http://localhost:5173/payos/cancel";
+        String desc = "Thanh toan " + user.getId() + "-" + orderCode;
+        String returnUrl = "http://localhost:5173/payos/callback";
+        String cancelUrl = "http://localhost:5173/payos/callback";
 
         ItemData item = ItemData.builder()
                 .name(product)
@@ -160,12 +156,29 @@ public class OrderServiceImpl implements OrderService {
                 .cancelUrl(cancelUrl)
                 .item(item)
                 .build();
-
         CheckoutResponseData data = payOS.createPaymentLink(paymentData);
         return PaymentDTO.PayOSResponse.builder()
                 .code("OK")
                 .message("PayOS Link")
                 .paymentUrl(data.getCheckoutUrl())
                 .build();
+    }
+
+    private Set<OrderItem> createOrderItem(List<CartItem> cartItems, Order order) {
+        return cartItems.stream().map((item) -> {
+            OrderItem orderItem = new OrderItem();
+            Size size = sizeRepository.findById(item.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+            size.setQuantity(size.getQuantity() - item.getQuantity());
+            Product product = productRepository.findById(item.getSize().getProduct().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            orderItem.setSize(size);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(item.getQuantity());
+            orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(product.getPrice()));
+            orderItem.setOrder(order);
+            sizeRepository.save(size);
+            return new OrderItem(item.getQuantity(), product.getPrice(), product, order, size);
+        }).collect(Collectors.toSet());
     }
 }

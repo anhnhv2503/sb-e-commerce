@@ -12,8 +12,6 @@ public interface OrderService {
 
     Order placeOrder(OrderRequest request);
 
-    Order getOrder(Long orderId);
-
     List<Order> getOrdersByUserId(OrderStatus status);
 
     Order cancelOrder(Long orderId);
