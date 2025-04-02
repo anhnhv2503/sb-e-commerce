@@ -150,7 +150,10 @@ public class ProductServiceImpl implements ProductService {
     public Size addMoreSize(Long productId, String sizeName, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         if(sizeRepository.findBySizeNameAndProductId(sizeName, productId) != null){
-            throw new AlreadyExistedException("Size already exists");
+            Size existedSize = sizeRepository.findBySizeNameAndProductId(sizeName, productId);
+            existedSize.setQuantity(existedSize.getQuantity() + quantity);
+            sizeRepository.save(existedSize);
+            return existedSize;
         }else{
             Size size = new Size();
             size.setSizeName(sizeName);

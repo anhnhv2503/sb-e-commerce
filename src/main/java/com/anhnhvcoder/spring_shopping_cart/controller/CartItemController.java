@@ -47,4 +47,11 @@ public class CartItemController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Item Removed"));
     }
 
+    @PutMapping("/update/{itemId}/{quantity}")
+    public ResponseEntity<ApiResponse> updateItemQuantity(@PathVariable Long itemId,
+                                                          @PathVariable Integer quantity){
+        cartItemService.updateQuantity(itemId, quantity);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Item Updated"));
+    }
+
 }

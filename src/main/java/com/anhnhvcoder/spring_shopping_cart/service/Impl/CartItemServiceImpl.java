@@ -75,4 +75,12 @@ public class CartItemServiceImpl implements CartItemService {
         cartItemRepository.delete(cartItem);
         cartRepository.save(cart);
     }
+
+    @Override
+    public void updateQuantity(Long itemId, int quantity) {
+        CartItem cartItem = cartItemRepository.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
+        cartItem.setQuantity(quantity);
+        cartItem.setTotalPrice(cartItem.getSize().getProduct().getPrice().multiply(new BigDecimal(quantity)));
+        cartItemRepository.save(cartItem);
+    }
 }
