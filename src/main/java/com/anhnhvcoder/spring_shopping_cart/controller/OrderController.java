@@ -74,4 +74,9 @@ public class OrderController {
     public ResponseEntity<?> confirmDelivered(@PathVariable Long orderId){
         return ResponseEntity.ok(new ApiResponse(1000, orderService.confirmDelivered(orderId)));
     }
+
+    @PostMapping("/payos/create-link")
+    public ResponseEntity<ApiResponse> createPaymentLink() throws Exception {
+        return ResponseEntity.ok(new ApiResponse(200, orderService.createPayOSPayment()));
+    }
 }

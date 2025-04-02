@@ -9,4 +9,11 @@ public class PaymentDTO {
         public String message;
         public String paymentUrl;
     }
+
+    @Builder
+    public static class PayOSResponse{
+        public String code;
+        public String message;
+        public String paymentUrl;
+    }
 }

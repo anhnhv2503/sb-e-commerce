@@ -1,9 +1,11 @@
 package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
+import com.anhnhvcoder.spring_shopping_cart.dto.PaymentDTO;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.*;
+import com.anhnhvcoder.spring_shopping_cart.repository.CartRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.OrderRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
@@ -38,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final SizeRepository sizeRepository;
     private final UserService userService;
+    private final CartRepository cartRepository;
     private final PayOS payOS;
 
     @Transactional
@@ -134,29 +137,35 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String createPayOSPayment(double price) throws Exception {
-        String product = "Test";
-        String desc = "Test";
-        String returnUrl = "http://localhost:8080/success";
-        String cancelUrl = "http://localhost:8080/cancel";
+    public PaymentDTO.PayOSResponse createPayOSPayment() throws Exception {
+        User user = userService.getAuthenticatedUser();
+        Cart cart = cartRepository.findByUserId(user.getId());
         String currentTimeString = String.valueOf(new Date().getTime());
         long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
+        String product = "VA Shop";
+        String desc = "Thanh toán đơn hàng " + user.getFullName() + "-" + orderCode;
+        String returnUrl = "http://localhost:5713/payos/success";
+        String cancelUrl = "http://localhost:5173/payos/cancel";
+
         ItemData item = ItemData.builder()
                 .name(product)
-                .quantity(1)
-                .price((int)price)
+                .quantity(cart.getTotalItems())
+                .price(Integer.valueOf(cart.getTotalPrice().intValue()))
                 .build();
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(orderCode)
                 .description(desc)
-                .amount((int)price)
-                .description(desc)
+                .amount(Integer.valueOf(cart.getTotalPrice().intValue()))
                 .returnUrl(returnUrl)
                 .cancelUrl(cancelUrl)
                 .item(item)
                 .build();
 
         CheckoutResponseData data = payOS.createPaymentLink(paymentData);
-        return data.getCheckoutUrl();
+        return PaymentDTO.PayOSResponse.builder()
+                .code("OK")
+                .message("PayOS Link")
+                .paymentUrl(data.getCheckoutUrl())
+                .build();
     }
 }

@@ -81,6 +81,10 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem = cartItemRepository.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         cartItem.setQuantity(quantity);
         cartItem.setTotalPrice(cartItem.getSize().getProduct().getPrice().multiply(new BigDecimal(quantity)));
+        Cart cart = cartRepository.findById(cartItem.getCart().getId()).get();
+        cart.setTotalItems(cart.getCartItems().size());
+        cart.updateTotalPrice();
+        cartRepository.save(cart);
         cartItemRepository.save(cartItem);
     }
 }

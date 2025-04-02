@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.service;
 
+import com.anhnhvcoder.spring_shopping_cart.dto.PaymentDTO;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.model.Order;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
@@ -23,5 +24,5 @@ public interface OrderService {
 
     Order confirmDelivered(Long orderId);
 
-    String createPayOSPayment(double price) throws Exception;
+    PaymentDTO.PayOSResponse createPayOSPayment() throws Exception;
 }

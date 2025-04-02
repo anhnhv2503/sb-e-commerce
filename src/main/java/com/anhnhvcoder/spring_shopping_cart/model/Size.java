@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "size")
 @AllArgsConstructor
@@ -25,8 +27,8 @@ public class Size {
     @JsonIgnore
     private Product product;
 
-    @ManyToOne
+    @OneToMany(mappedBy = "size")
     @JsonIgnore
-    private CartItem cartItem;
+    private List<CartItem> cartItem;
 
 }

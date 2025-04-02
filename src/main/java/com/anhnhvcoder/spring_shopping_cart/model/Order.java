@@ -1,6 +1,7 @@
 package com.anhnhvcoder.spring_shopping_cart.model;
 
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
+import com.anhnhvcoder.spring_shopping_cart.enums.PaymentStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -29,13 +30,14 @@ public class Order {
     private BigDecimal totalAmount;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private String orderAddress;
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
-
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+    private Long orderCode;
+    private String orderAddress;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
