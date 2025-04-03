@@ -157,6 +157,19 @@ public class OrderServiceImpl implements OrderService {
                 .item(item)
                 .build();
         CheckoutResponseData data = payOS.createPaymentLink(paymentData);
+
+        Order order = new Order();
+        order.setOrderDate(LocalDate.now());
+        order.setTotalAmount(cart.getTotalPrice());
+        order.setStatus(OrderStatus.PENDING);
+        order.setPaymentType(PaymentType.PAYOS);
+        order.setPaymentStatus(PaymentStatus.PENDING);
+        order.setOrderCode(orderCode);
+        order.setOrderAddress(user.getAddress());
+        order.setUser(user);
+
+        orderRepository.save(order);
+
         return PaymentDTO.PayOSResponse.builder()
                 .code("OK")
                 .message("PayOS Link")

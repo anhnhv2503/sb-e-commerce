@@ -79,4 +79,9 @@ public class OrderController {
     public ResponseEntity<ApiResponse> createPaymentLink() throws Exception {
         return ResponseEntity.ok(new ApiResponse(200, orderService.createPayOSPayment()));
     }
+
+    @PostMapping("/payos/execute")
+    public ResponseEntity<ApiResponse> executePayment(){
+        return null;
+    }
 }
