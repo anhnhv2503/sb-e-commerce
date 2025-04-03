@@ -21,25 +21,11 @@ public class OrderItem {
     private Long id;
     private int quantity;
     private BigDecimal price;
-
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @ManyToOne()
     @JoinColumn(name = "size_id")
     private Size size;
-
     @ManyToOne
     @JoinColumn(name = "order_id")
     @JsonIgnore
     private Order order;
-
-    public OrderItem(int quantity, BigDecimal price, Product product, Order order, Size size) {
-        this.quantity = quantity;
-        this.price = price;
-        this.product = product;
-        this.order = order;
-        this.size = size;
-    }
 }

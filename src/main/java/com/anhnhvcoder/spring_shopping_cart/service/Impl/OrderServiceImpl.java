@@ -6,11 +6,10 @@ import com.anhnhvcoder.spring_shopping_cart.enums.PaymentStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
 import com.anhnhvcoder.spring_shopping_cart.model.*;
-import com.anhnhvcoder.spring_shopping_cart.repository.CartRepository;
-import com.anhnhvcoder.spring_shopping_cart.repository.OrderRepository;
-import com.anhnhvcoder.spring_shopping_cart.repository.ProductRepository;
-import com.anhnhvcoder.spring_shopping_cart.repository.SizeRepository;
+import com.anhnhvcoder.spring_shopping_cart.repository.*;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
+import com.anhnhvcoder.spring_shopping_cart.request.PaymentRequest;
+import com.anhnhvcoder.spring_shopping_cart.service.CartService;
 import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +42,9 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final CartRepository cartRepository;
     private final PayOS payOS;
+    private final CartService cartService;
+    private final CartItemRepository cartItemRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional
     @Override
@@ -75,12 +77,11 @@ public class OrderServiceImpl implements OrderService {
             size.setQuantity(size.getQuantity() - item.getQuantity());
             Product product = productRepository.findById(item.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
             orderItem.setSize(size);
-            orderItem.setProduct(product);
             orderItem.setQuantity(item.getQuantity());
             orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(product.getPrice()));
             orderItem.setOrder(order);
             sizeRepository.save(size);
-            return new OrderItem(item.getQuantity(), product.getPrice(), product, order, size);
+            return orderItemRepository.save(orderItem);
         }).collect(Collectors.toSet());
     }
 
@@ -179,19 +180,40 @@ public class OrderServiceImpl implements OrderService {
 
     private Set<OrderItem> createOrderItem(List<CartItem> cartItems, Order order) {
         return cartItems.stream().map((item) -> {
+
             OrderItem orderItem = new OrderItem();
-            Size size = sizeRepository.findById(item.getId())
+            Size size = sizeRepository.findById(item.getSize().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Size not found"));
             size.setQuantity(size.getQuantity() - item.getQuantity());
             Product product = productRepository.findById(item.getSize().getProduct().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
             orderItem.setSize(size);
-            orderItem.setProduct(product);
             orderItem.setQuantity(item.getQuantity());
             orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(product.getPrice()));
             orderItem.setOrder(order);
             sizeRepository.save(size);
-            return new OrderItem(item.getQuantity(), product.getPrice(), product, order, size);
+            return orderItemRepository.save(orderItem);
         }).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Order executePaymentOrder(PaymentRequest request) {
+        User user = userService.getAuthenticatedUser();
+        Cart cart = cartRepository.findByUserId(user.getId());
+        List<CartItem> items = cartItemRepository.findByCartId(cart.getId());
+        Order order = orderRepository.findByOrderCode(request.getOrderCode())
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        if(!request.isCancel()){
+            order.setStatus(OrderStatus.IN_PROGRESS);
+            order.setPaymentStatus(PaymentStatus.SUCCESS);
+            Set<OrderItem> orderItems = createOrderItem(items, order);
+            order.getOrderItems().clear();
+            order.getOrderItems().addAll(orderItems);
+            cartService.clearCart();
+        }else{
+            order.setStatus(OrderStatus.CANCELLED);
+            order.setPaymentStatus(PaymentStatus.CANCELED);
+        }
+        return orderRepository.save(order);
     }
 }

@@ -3,6 +3,7 @@ package com.anhnhvcoder.spring_shopping_cart.controller;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.model.Order;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
+import com.anhnhvcoder.spring_shopping_cart.request.PaymentRequest;
 import com.anhnhvcoder.spring_shopping_cart.response.ApiResponse;
 import com.anhnhvcoder.spring_shopping_cart.service.Impl.VNPayService;
 import com.anhnhvcoder.spring_shopping_cart.service.OrderService;
@@ -81,7 +82,11 @@ public class OrderController {
     }
 
     @PostMapping("/payos/execute")
-    public ResponseEntity<ApiResponse> executePayment(){
-        return null;
+    public ResponseEntity<ApiResponse> executePayment(@RequestBody PaymentRequest request){
+        if(request.getCode() == 00 && !request.isCancel()){
+            return ResponseEntity.ok(new ApiResponse(200, orderService.executePaymentOrder(request)));
+        }else{
+            return ResponseEntity.ok(new ApiResponse(1001, orderService.executePaymentOrder(request)));
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.anhnhvcoder.spring_shopping_cart.dto.PaymentDTO;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.model.Order;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
+import com.anhnhvcoder.spring_shopping_cart.request.PaymentRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface OrderService {
     Order confirmDelivered(Long orderId);
 
     PaymentDTO.PayOSResponse createPayOSPayment() throws Exception;
+
+    Order executePaymentOrder(PaymentRequest request);
 }

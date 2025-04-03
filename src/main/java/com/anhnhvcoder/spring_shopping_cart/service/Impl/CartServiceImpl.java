@@ -8,6 +8,7 @@ import com.anhnhvcoder.spring_shopping_cart.model.CartItem;
 import com.anhnhvcoder.spring_shopping_cart.model.User;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartItemRepository;
 import com.anhnhvcoder.spring_shopping_cart.repository.CartRepository;
+import com.anhnhvcoder.spring_shopping_cart.service.CartItemService;
 import com.anhnhvcoder.spring_shopping_cart.service.CartService;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
     private final UserService userService;
     private final CartMapper cartMapper;
+    private final CartItemService cartItemService;
 
     @Override
     public CartDTO getCart() {
@@ -49,5 +51,16 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getCartByUserId(Long userId) {
         return cartRepository.findByUserId(userId);
+    }
+
+    @Transactional
+    @Override
+    public void clearCart() {
+        User user = userService.getAuthenticatedUser();
+        Cart cart = cartRepository.findByUserId(user.getId());
+        cart.getCartItems().clear();
+        cart.setTotalPrice(BigDecimal.ZERO);
+        cart.setTotalItems(0);
+        cartRepository.save(cart);
     }
 }

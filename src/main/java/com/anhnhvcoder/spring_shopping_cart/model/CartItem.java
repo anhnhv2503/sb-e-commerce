@@ -21,10 +21,8 @@ public class CartItem {
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
-
     @ManyToOne
     private Size size;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     @JsonIgnore
