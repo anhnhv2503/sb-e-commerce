@@ -1,10 +1,12 @@
 package com.anhnhvcoder.spring_shopping_cart.service.Impl;
 
+import com.anhnhvcoder.spring_shopping_cart.dto.OrderDTO;
 import com.anhnhvcoder.spring_shopping_cart.dto.PaymentDTO;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentStatus;
 import com.anhnhvcoder.spring_shopping_cart.enums.PaymentType;
 import com.anhnhvcoder.spring_shopping_cart.exception.ResourceNotFoundException;
+import com.anhnhvcoder.spring_shopping_cart.mapper.OrderMapper;
 import com.anhnhvcoder.spring_shopping_cart.model.*;
 import com.anhnhvcoder.spring_shopping_cart.repository.*;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
@@ -45,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final CartItemRepository cartItemRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderMapper orderMapper;
 
     @Transactional
     @Override
@@ -86,9 +89,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getOrdersByUserId(OrderStatus status) {
+    public List<OrderDTO> getOrdersByUserId(OrderStatus status) {
         User user = userService.getAuthenticatedUser();
-        return orderRepository.findByUserIdAndStatus(user.getId(), status);
+        List<Order> orders = orderRepository.findByUserIdAndStatus(user.getId(), status);
+        return orders.stream().map(orderMapper::toOrderDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -105,9 +109,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<Order> getAllOrders(int page, OrderStatus status) {
+    public Page<OrderDTO> getAllOrders(int page, OrderStatus status) {
         Pageable pageable = PageRequest.of(page, 7);
-        return orderRepository.findByStatusOrderByOrderDateDesc(pageable, status);
+        Page<Order> orders = orderRepository.findByStatusOrderByOrderDateDesc(pageable, status);
+        return orders.map(orderMapper::toOrderDTO);
     }
 
     @Override

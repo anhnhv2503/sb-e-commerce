@@ -79,6 +79,7 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     public void updateQuantity(Long itemId, int quantity) {
         CartItem cartItem = cartItemRepository.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
+        if(quantity > cartItem.getSize().getQuantity()) throw new ResourceNotFoundException(cartItem.getSize().getProduct().getName() + " chỉ còn " + cartItem.getSize().getQuantity());
         cartItem.setQuantity(quantity);
         cartItem.setTotalPrice(cartItem.getSize().getProduct().getPrice().multiply(new BigDecimal(quantity)));
         Cart cart = cartRepository.findById(cartItem.getCart().getId()).get();

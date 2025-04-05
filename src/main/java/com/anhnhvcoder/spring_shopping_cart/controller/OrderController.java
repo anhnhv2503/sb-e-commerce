@@ -1,5 +1,6 @@
 package com.anhnhvcoder.spring_shopping_cart.controller;
 
+import com.anhnhvcoder.spring_shopping_cart.dto.OrderDTO;
 import com.anhnhvcoder.spring_shopping_cart.enums.OrderStatus;
 import com.anhnhvcoder.spring_shopping_cart.model.Order;
 import com.anhnhvcoder.spring_shopping_cart.request.OrderRequest;
@@ -62,7 +63,7 @@ public class OrderController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam OrderStatus status){
+    public ResponseEntity<Page<OrderDTO>> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam OrderStatus status){
         return ResponseEntity.ok(orderService.getAllOrders(page, status));
     }
 
