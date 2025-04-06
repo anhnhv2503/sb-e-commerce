@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class OrderMapper {
 
     private final OrderItemMapper orderItemMapper;
+    private final UserMapper userMapper;
 
     public OrderDTO toOrderDTO(Order order) {
         OrderDTO dto = new OrderDTO();
@@ -22,7 +23,7 @@ public class OrderMapper {
         dto.setOrderCode(order.getOrderCode());
         dto.setOrderAddress(order.getOrderAddress());
         dto.setItems(orderItemMapper.toOrderItemDTOSet(order.getOrderItems()));
-
+        dto.setUser(userMapper.toUserDTO(order.getUser()));
         return dto;
     }
 }

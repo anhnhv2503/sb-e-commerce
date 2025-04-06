@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/order")
@@ -63,8 +65,13 @@ public class OrderController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<OrderDTO>> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam OrderStatus status){
+    public ResponseEntity<Page<OrderDTO>> getAllOrders(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(required = false) OrderStatus status){
         return ResponseEntity.ok(orderService.getAllOrders(page, status));
+    }
+
+    @GetMapping("/newest")
+    public ResponseEntity<List<OrderDTO>> getNewestOrders(){
+        return ResponseEntity.ok(orderService.getNewestOrders());
     }
 
     @PutMapping("/update-order-status/{orderId}")

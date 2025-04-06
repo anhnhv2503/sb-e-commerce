@@ -23,4 +23,5 @@ public class OrderDTO {
     private Long orderCode;
     private String orderAddress;
     private Set<OrderItemDTO> items;
+    private UserDTO user;
 }

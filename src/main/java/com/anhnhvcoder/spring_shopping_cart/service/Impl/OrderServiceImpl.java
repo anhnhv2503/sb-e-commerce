@@ -221,4 +221,10 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderRepository.save(order);
     }
+
+    @Override
+    public List<OrderDTO> getNewestOrders() {
+        List<Order> orders = orderRepository.findTop3ByOrderByOrderDateDesc();
+        return orders.stream().map(orderMapper::toOrderDTO).collect(Collectors.toList());
+    }
 }

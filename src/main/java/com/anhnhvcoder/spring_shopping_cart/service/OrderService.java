@@ -27,4 +27,6 @@ public interface OrderService {
     PaymentDTO.PayOSResponse createPayOSPayment() throws Exception;
 
     Order executePaymentOrder(PaymentRequest request);
+
+    List<OrderDTO> getNewestOrders();
 }
