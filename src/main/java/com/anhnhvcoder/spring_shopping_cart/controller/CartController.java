@@ -8,6 +8,9 @@ import com.anhnhvcoder.spring_shopping_cart.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -19,6 +22,7 @@ import java.math.BigDecimal;
 public class CartController {
 
     private final CartService cartService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("/my-cart")
     public ResponseEntity<ApiResponse> getCart(){
@@ -27,6 +31,11 @@ public class CartController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }
+    }
+
+    @MessageMapping
+    public void processCart() {
+        messagingTemplate.convertAndSend("/topic/cart", 11);
     }
 
 }

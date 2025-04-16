@@ -12,6 +12,7 @@ import com.anhnhvcoder.spring_shopping_cart.service.CartItemService;
 import com.anhnhvcoder.spring_shopping_cart.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartRepository cartRepository;
     private final SizeRepository sizeRepository;
     private final UserService userService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public Cart addItemToCart(Long cartId, int quantity, Long sizeId) {
@@ -45,6 +47,8 @@ public class CartItemServiceImpl implements CartItemService {
             cart.addToCart(existingItem);
             cart.setTotalItems(cart.getCartItems().size());
             cartRepository.save(cart);
+            messagingTemplate.convertAndSend("/topic/cart", cart.getCartItems().size());
+            log.info("Added cart to cart : {}", cart.getCartItems().size());
             return cart;
         }else {
             CartItem cartItem = new CartItem();
@@ -57,6 +61,8 @@ public class CartItemServiceImpl implements CartItemService {
             cart.addToCart(cartItem);
             cart.setTotalItems(cart.getCartItems().size());
             cartRepository.save(cart);
+            messagingTemplate.convertAndSend("/topic/cart", cart.getCartItems().size());
+            log.info("Added cart to cart : {}", cart.getCartItems().size());
             return cart;
         }
     }
@@ -74,6 +80,8 @@ public class CartItemServiceImpl implements CartItemService {
         cart.updateTotalPrice();
         cartItemRepository.delete(cartItem);
         cartRepository.save(cart);
+        messagingTemplate.convertAndSend("/topic/cart", cart.getCartItems().size());
+        log.info("Added cart to cart : {}", cart.getCartItems().size());
     }
 
     @Override
