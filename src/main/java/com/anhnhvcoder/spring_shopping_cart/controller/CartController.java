@@ -33,9 +33,9 @@ public class CartController {
         }
     }
 
-    @MessageMapping
-    public void processCart() {
-        messagingTemplate.convertAndSend("/topic/cart", 11);
+    @GetMapping("/count")
+    public ResponseEntity<ApiResponse> getCartItemQuantity(){
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), cartService.getCartCount()));
     }
 
 }

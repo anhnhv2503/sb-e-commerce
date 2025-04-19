@@ -10,4 +10,5 @@ public interface CartService {
     Cart initializeNewCart(User user);
     Cart getCartByUserId(Long userId);
     void clearCart();
+    Integer getCartCount();
 }

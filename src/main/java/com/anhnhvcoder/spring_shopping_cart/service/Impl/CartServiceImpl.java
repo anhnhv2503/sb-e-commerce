@@ -60,4 +60,10 @@ public class CartServiceImpl implements CartService {
         cart.setTotalItems(0);
         cartRepository.save(cart);
     }
+
+    @Override
+    public Integer getCartCount() {
+        CartDTO cart = getCart();
+        return cart.getTotalItem();
+    }
 }
