@@ -61,7 +61,7 @@ public class ApplicationInitConfig {
                 categoryRepository.save(c7);
                 log.warn("Default categories created");
             }
-            if(userRepository.findByEmail("prjonlineshop@gmail.com") == null){
+            if(userRepository.findByEmail("prjonlineshop@gmail.com").isEmpty()){
                 User user = new User();
                 user.setFullName("AD Văn MIN");
                 user.setPhone("0999999999");
