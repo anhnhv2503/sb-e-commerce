@@ -63,15 +63,16 @@ public class AuthenticationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         var user = userRepository.findByEmail(userInfo.getEmail()).orElseGet(
-                () -> userRepository.save(User.builder()
-                                .fullName(userInfo.getName())
-                                .email(userInfo.getEmail())
-                                .roles(Set.of(roles))
-                                .active(true)
-                                .address(userInfo.getFamilyName() + " address")
-                                .phone("")
-                                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                        .build())
+                () -> {
+                    User newUser = new User();
+                    newUser.setEmail(userInfo.getEmail());
+                    newUser.setEmail(userInfo.getEmail());
+                    newUser.setRoles(Set.of(roles));
+                    newUser.setActive(true);
+                    newUser.setAddress(userInfo.getFamilyName() + " address");
+                    newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                    return userRepository.save(newUser);
+                }
         );
 
         String token = jwtUtils.generateTokenForGoogleUser(user);
