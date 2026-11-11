@@ -4,6 +4,7 @@ import com.anhnhvcoder.ecommerce.model.Product;
 import com.anhnhvcoder.ecommerce.model.Size;
 import com.anhnhvcoder.ecommerce.response.ApiResponse;
 import com.anhnhvcoder.ecommerce.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addProduct(@RequestParam("name") String name,
@@ -40,6 +42,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/size/add/{productId}")
     public ResponseEntity<ApiResponse> addMoreSize(@PathVariable("productId") Long productId,
@@ -64,6 +67,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id){
@@ -72,6 +76,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/update")
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id,
@@ -87,12 +92,6 @@ public class ProductController {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), product);
         return ResponseEntity.ok(apiResponse);
     }
-
-//    @GetMapping("/brand")
-//    public ResponseEntity<ApiResponse> getProductsByBrand(@RequestParam("brand") String brand){
-//        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), productService.findByBrand(brand));
-//        return ResponseEntity.ok(apiResponse);
-//    }
 
     @GetMapping("/category")
     public ResponseEntity<ApiResponse> getProductsByCategory(@RequestParam("categoryId") Long categoryId){
@@ -136,6 +135,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/size/edit/{sizeId}")
     public ResponseEntity<?> editSizeInventory(@PathVariable("sizeId") Long sizeId, @RequestParam("quantity") int quantity){

@@ -8,9 +8,12 @@ import com.anhnhvcoder.ecommerce.service.CartItemService;
 import com.anhnhvcoder.ecommerce.service.CartService;
 import com.anhnhvcoder.ecommerce.service.UserService;
 import io.jsonwebtoken.JwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin("*")
@@ -23,6 +26,9 @@ public class CartItemController {
     private final CartItemService cartItemService;
     private final UserService userService;
 
+    @Operation(summary = "API for add item to cart", description = "Authenticated User add item to cart")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/item/add")
     public ResponseEntity<ApiResponse> addItemToCart(@RequestParam("quantity") int quantity,
                                                      @RequestParam("sizeId") Long sizeId){
@@ -38,12 +44,18 @@ public class CartItemController {
         }
     }
 
+    @Operation(summary = "API for remove item from cart", description = "Authenticated User remove item from cart")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<ApiResponse> removeItemFromCart(@PathVariable Long itemId){
         cartItemService.removeItemFromCart(itemId);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Item Removed"));
     }
 
+    @Operation(summary = "API for update cart", description = "Authenticated User update cart")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("/update/{itemId}/{quantity}")
     public ResponseEntity<ApiResponse> updateItemQuantity(@PathVariable Long itemId,
                                                           @PathVariable Integer quantity){

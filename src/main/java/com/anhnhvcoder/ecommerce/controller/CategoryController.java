@@ -3,6 +3,8 @@ package com.anhnhvcoder.ecommerce.controller;
 import com.anhnhvcoder.ecommerce.model.Category;
 import com.anhnhvcoder.ecommerce.response.ApiResponse;
 import com.anhnhvcoder.ecommerce.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @Operation(summary = "API for add new category", description = "Only ROLE_ADMIN can add new category")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addCategory(@RequestParam("name") String name) {
@@ -42,6 +46,8 @@ public class CategoryController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(summary = "API for delete category", description = "Only ROLE_ADMIN can delete category")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<ApiResponse> deleteCategory(@PathVariable("id") Long id) {

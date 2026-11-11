@@ -8,6 +8,7 @@ import com.anhnhvcoder.ecommerce.request.PaymentRequest;
 import com.anhnhvcoder.ecommerce.response.ApiResponse;
 import com.anhnhvcoder.ecommerce.service.Impl.VNPayService;
 import com.anhnhvcoder.ecommerce.service.OrderService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class OrderController {
     private final OrderService orderService;
     private final VNPayService vnPayService;
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/place-order")
     public ResponseEntity<ApiResponse> placeOrder(@RequestBody OrderRequest request){
         if(request.getPaymentMethod().equals("cod")){
@@ -36,6 +38,7 @@ public class OrderController {
         return ResponseEntity.badRequest().body(new ApiResponse(1001, "Payment method not supported yet"));
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/vnpay")
     public ResponseEntity<?> vnPay(@RequestBody OrderRequest request, HttpServletRequest httpServletRequest){
         if(request.getPaymentMethod().equals("vnpay")){
