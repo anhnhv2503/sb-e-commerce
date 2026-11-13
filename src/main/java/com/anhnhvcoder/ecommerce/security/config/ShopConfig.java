@@ -44,6 +44,7 @@ public class ShopConfig {
                     "/api/categories/add",
                     "/api/categories/{id}/delete",
                     "/api/dashboard/**",
+                    "/api/admin/**",
                     "/api/cart/my-cart");
 
     @Bean

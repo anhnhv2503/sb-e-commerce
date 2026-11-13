@@ -1,5 +1,6 @@
 package com.anhnhvcoder.ecommerce.security.jwt;
 
+import com.anhnhvcoder.ecommerce.exception.InactiveUserException;
 import com.anhnhvcoder.ecommerce.security.user.ShopUserDetailsService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -35,6 +36,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
+        } catch (InactiveUserException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write(e.getMessage());
+            return;
         } catch (JwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(e.getMessage() +" : Invalid or expired token, you may login and try again!");

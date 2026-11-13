@@ -9,6 +9,7 @@ import com.anhnhvcoder.ecommerce.exception.ResourceNotFoundException;
 import com.anhnhvcoder.ecommerce.mapper.OrderMapper;
 import com.anhnhvcoder.ecommerce.model.*;
 import com.anhnhvcoder.ecommerce.repository.*;
+import com.anhnhvcoder.ecommerce.request.OrderItemRequest;
 import com.anhnhvcoder.ecommerce.request.OrderRequest;
 import com.anhnhvcoder.ecommerce.request.PaymentRequest;
 import com.anhnhvcoder.ecommerce.service.CartService;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.PayOS;
@@ -30,7 +32,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,17 +78,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Set<OrderItem> createOrderItems(OrderRequest request, Order order){
+        // One query for every size in the order (with its product) instead of two per item.
+        Map<Long, Size> sizes = sizeRepository.findByIdIn(
+                        request.getItems().stream().map(OrderItemRequest::getSizeId).toList())
+                .stream()
+                .collect(Collectors.toMap(Size::getId, Function.identity()));
+
         return request.getItems().stream().map((item) -> {
-            OrderItem orderItem = new OrderItem();
-            Size size = sizeRepository.findById(item.getSizeId()).orElseThrow(()-> new ResourceNotFoundException("Size not found"));
+            Size size = sizes.get(item.getSizeId());
+            if (size == null) {
+                throw new ResourceNotFoundException("Size not found");
+            }
+            // Runs inside placeOrder's transaction: the stock change is flushed by dirty checking
+            // and the order item is inserted by the cascade from orderRepository.save(order).
             size.setQuantity(size.getQuantity() - item.getQuantity());
-            Product product = productRepository.findById(item.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            OrderItem orderItem = new OrderItem();
             orderItem.setSize(size);
             orderItem.setQuantity(item.getQuantity());
-            orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(product.getPrice()));
+            orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(size.getProduct().getPrice()));
             orderItem.setOrder(order);
-            sizeRepository.save(size);
-            return orderItemRepository.save(orderItem);
+            return orderItem;
         }).collect(Collectors.toSet());
     }
 
@@ -95,23 +108,29 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream().map(orderMapper::toOrderDTO).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public Order cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        checkOrderOwnerOrAdmin(order);
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.IN_PROGRESS) {
+            throw new IllegalStateException("Only PENDING or IN_PROGRESS orders can be cancelled");
+        }
         order.setStatus(OrderStatus.CANCELLED);
-        order.getOrderItems().stream().map((item) -> {
+        // Sizes are batch-loaded; the restock is flushed by dirty checking at commit.
+        order.getOrderItems().forEach((item) -> {
             Size size = item.getSize();
             size.setQuantity(size.getQuantity() + item.getQuantity());
-            sizeRepository.save(size);
-            return item;
-        }).collect(Collectors.toSet());
+        });
         return orderRepository.save(order);
     }
 
     @Override
     public Page<OrderDTO> getAllOrders(int page, OrderStatus status) {
-        Pageable pageable = PageRequest.of(page, 7);
-        Page<Order> orders = orderRepository.findByStatusOrderByOrderDateDesc(pageable, status);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), 7);
+        Page<Order> orders = status == null
+                ? orderRepository.findAllByOrderByOrderDateDescIdDesc(pageable)
+                : orderRepository.findByStatusOrderByOrderDateDescIdDesc(pageable, status);
         return orders.map(orderMapper::toOrderDTO);
     }
 
@@ -131,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order confirmDelivered(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        checkOrderOwnerOrAdmin(order);
         if(order.getStatus().equals(OrderStatus.SHIPPING)){
             order.setStatus(OrderStatus.DELIVERED);
             return orderRepository.save(order);
@@ -184,23 +204,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Set<OrderItem> createOrderItem(List<CartItem> cartItems, Order order) {
+        // Cart items were loaded with their size and product (CartItemRepository.findByCartId),
+        // so no extra lookups are needed per item.
         return cartItems.stream().map((item) -> {
-
-            OrderItem orderItem = new OrderItem();
-            Size size = sizeRepository.findById(item.getSize().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+            Size size = item.getSize();
             size.setQuantity(size.getQuantity() - item.getQuantity());
-            Product product = productRepository.findById(item.getSize().getProduct().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            OrderItem orderItem = new OrderItem();
             orderItem.setSize(size);
             orderItem.setQuantity(item.getQuantity());
-            orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(product.getPrice()));
+            orderItem.setPrice(BigDecimal.valueOf(item.getQuantity()).multiply(size.getProduct().getPrice()));
             orderItem.setOrder(order);
-            sizeRepository.save(size);
-            return orderItemRepository.save(orderItem);
+            return orderItem;
         }).collect(Collectors.toSet());
     }
 
+    @Transactional
     @Override
     public Order executePaymentOrder(PaymentRequest request) {
         User user = userService.getAuthenticatedUser();
@@ -222,9 +240,18 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
+    private void checkOrderOwnerOrAdmin(Order order) {
+        User user = userService.getAuthenticatedUser();
+        boolean isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getRoleName()));
+        boolean isOwner = order.getUser() != null && order.getUser().getId().equals(user.getId());
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException("You are not allowed to modify this order");
+        }
+    }
+
     @Override
     public List<OrderDTO> getNewestOrders() {
-        List<Order> orders = orderRepository.findTop3ByOrderByOrderDateDesc();
+        List<Order> orders = orderRepository.findTop3ByOrderByOrderDateDescIdDesc();
         return orders.stream().map(orderMapper::toOrderDTO).collect(Collectors.toList());
     }
 }

@@ -39,10 +39,10 @@ public class UserServiceImpl implements UserService {
         if (!phone.matches(phoneRegex)) {
             throw new RuntimeException("Invalid phone number. It should contain 10 digits.");
         }
-        if (userRepository.findByPhone(phone) != null) {
+        if (userRepository.existsByPhone(phone)) {
             throw new AlreadyExistedException("Phone number is already registered");
         }
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             throw new AlreadyExistedException("Email is already registered");
         } else {
             User user = new User();
@@ -88,10 +88,10 @@ public class UserServiceImpl implements UserService {
         if (!phone.matches(phoneRegex)) {
             throw new RuntimeException("Invalid phone number. It should contain 10 digits.");
         }
-        if (userRepository.findByPhone(phone) != null) {
+        if (userRepository.existsByPhone(phone)) {
             throw new AlreadyExistedException("Phone number is already registered");
         }
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             throw new AlreadyExistedException("Email is already registered");
         } else {
             User admin = new User();
@@ -103,6 +103,7 @@ public class UserServiceImpl implements UserService {
             Role adminRole = roleRepository.findByRoleName("ROLE_ADMIN")
                     .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
             admin.setRoles(Set.of(adminRole));
+            admin.setActive(true);
             return userRepository.save(admin);
         }
     }

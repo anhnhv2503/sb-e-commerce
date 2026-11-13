@@ -46,7 +46,8 @@ src/main/java/com/anhnhvcoder/ecommerce
 - **Cart**: add, update and remove items. The cart item count is broadcast on `/topic/cart`.
 - **Orders**: place, cancel and confirm delivery. Status moves through `PENDING → IN_PROGRESS → SHIPPING → DELIVERED` (or `CANCELLED`).
 - **Payments**: VNPAY (payment URL plus callback), PayOS (payment link plus execute), or cash on delivery.
-- **Dashboard**: summary data for the admin panel.
+- **Admin user management**: list, search and filter users; create accounts; edit profiles; lock and unlock accounts; activate accounts by hand; change roles; delete users who have no orders. A locked user can't log in (password or Google), and their existing tokens are rejected with `403`.
+- **Dashboard** (admin only): summary totals, order counts by status, monthly revenue for a year, best-selling products and low-stock sizes.
 - **Rate limiting**: a token bucket per client IP for `/api/**`. Over the limit, the API returns `429` with a `Retry-After` header.
 
 ## Getting started
@@ -126,22 +127,25 @@ Every endpoint is under `/api`. Responses are wrapped in `ApiResponse` (`statusC
 | | | `POST /add`, `PUT /{id}/update`, `DELETE /{id}/delete`, `POST /size/add/{productId}`, `PUT /size/edit/{sizeId}` | Admin |
 | Categories | `/api/categories` | `GET /all`, `GET /{id}/get` | Public |
 | | | `POST /add`, `DELETE /{id}/delete` | Admin |
-| Brands | `/api/brands` | `POST /` | Admin |
+| Brands | `/api/brands` | `GET /`, `GET /{id}` | Public |
+| | | `POST /`, `PUT /{id}`, `DELETE /{id}` (refused if products use the brand) | Admin |
 | Cart | `/api/cart` | `GET /my-cart`, `GET /count` | User |
 | Cart items | `/api/cart-item` | `POST /item/add`, `PUT /update/{itemId}/{quantity}`, `DELETE /remove/{itemId}` | User |
-| Orders | `/api/order` | `POST /place-order`, `GET /my-orders`, `PUT /cancel-order/{orderId}`, `PUT /confirm-delivered/{orderId}` | Authenticated |
-| | | `GET /all`, `GET /newest`, `PUT /update-order-status/{orderId}` | Authenticated (meant for admin) |
+| Orders | `/api/order` | `POST /place-order`, `GET /my-orders` | Authenticated |
+| | | `PUT /cancel-order/{orderId}` (PENDING/IN_PROGRESS only), `PUT /confirm-delivered/{orderId}` | Order owner or admin |
+| | | `GET /all?page&status`, `GET /newest`, `PUT /update-order-status/{orderId}` | Admin |
 | | | `POST /vnpay`, `POST /vnpay-callback`, `POST /payos/create-link`, `POST /payos/execute` | Authenticated |
-| Dashboard | `/api/dashboard` | `GET /data` | Authenticated (meant for admin) |
+| Admin users | `/api/admin/users` | `GET ?search&role&active&page&size`, `GET /{id}`, `POST /`, `PUT /{id}`, `PUT /{id}/lock`, `PUT /{id}/unlock`, `PUT /{id}/activate`, `PUT /{id}/role?roleName`, `DELETE /{id}` | Admin |
+| Dashboard | `/api/dashboard` | `GET /data`, `GET /order-status`, `GET /revenue?year`, `GET /top-products?limit`, `GET /low-stock?threshold` | Admin |
 
-> **Note:** the order and dashboard endpoints only check that the caller is logged in; they do not check for `ROLE_ADMIN`. Add `@PreAuthorize("hasRole('ROLE_ADMIN')")` to them if they should be admin-only.
+Admins can't lock, delete or change the role of their own account. A caller without the required role gets `403`.
 
 ### Interactive docs
 
 - OpenAPI JSON: http://localhost:8080/shop/api-docs
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
 
-In Swagger UI, use **Authorize** ("Bearer Authentication") to paste a JWT.
+In Swagger UI, use **Authorize** ("Bearer Authentication") to paste a JWT (the `accessToken` returned by `POST /api/auth/login`). The definition dropdown has three groups: **all**, **shop** (storefront APIs) and **admin** (`/api/admin/**` and `/api/dashboard/**`).
 
 ### WebSocket
 

@@ -36,14 +36,15 @@ public class CartItemServiceImpl implements CartItemService {
         Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         Size size = sizeRepository.findById(sizeId).orElseThrow(() -> new RuntimeException("Size not found"));
         if(quantity > size.getQuantity()) throw new ResourceNotFoundException("Quantity is greater than size quantity");
-        Optional<CartItem> isPresentItem = cartItemRepository.findBySizeId(sizeId);
+        Optional<CartItem> isPresentItem = cartItemRepository.findByCartIdAndSizeId(cartId, sizeId);
         if(isPresentItem.isPresent()) {
             CartItem existingItem = isPresentItem.get();
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
             existingItem.setTotalPrice(existingItem.getTotalPrice()
                     .add(size.getProduct().getPrice().multiply(new BigDecimal(quantity))));
             cartItemRepository.save(existingItem);
-            cart.addToCart(existingItem);
+            // The item is already in this cart: only the totals change.
+            cart.updateTotalPrice();
             cart.setTotalItems(cart.getCartItems().size());
             cartRepository.save(cart);
             messagingTemplate.convertAndSend("/topic/cart", cart.getCartItems().size());

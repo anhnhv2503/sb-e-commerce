@@ -5,6 +5,7 @@ import com.anhnhvcoder.ecommerce.response.ApiResponse;
 import com.anhnhvcoder.ecommerce.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/categories")
 @RestController
 @CrossOrigin("*")
+@Tag(name = "Categories", description = "Product categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -34,12 +36,14 @@ public class CategoryController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(summary = "API get all categories")
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllCategories() {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), categoryService.getAllCategories());
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(summary = "API get category by id")
     @GetMapping("/{id}/get")
     public ResponseEntity<ApiResponse> getCategoryById(@PathVariable("id") Long id) {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), categoryService.getCategoryById(id));

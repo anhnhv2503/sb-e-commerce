@@ -1,6 +1,7 @@
 package com.anhnhvcoder.ecommerce.service.Impl;
 
 import com.anhnhvcoder.ecommerce.dto.CartDTO;
+import com.anhnhvcoder.ecommerce.exception.ResourceNotFoundException;
 import com.anhnhvcoder.ecommerce.mapper.CartMapper;
 import com.anhnhvcoder.ecommerce.model.Cart;
 import com.anhnhvcoder.ecommerce.model.User;
@@ -27,7 +28,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDTO getCart() {
         User user = userService.getAuthenticatedUser();
-        Cart cart = cartRepository.findByUserId(user.getId());
+        Cart cart = cartRepository.findWithItemsByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         messagingTemplate.convertAndSend("/topic/cart", cart.getCartItems().size());
         return cartMapper.toCartDTO(cart);
     }
@@ -63,7 +65,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Integer getCartCount() {
-        CartDTO cart = getCart();
-        return cart.getTotalItem();
+        // Only the stored counter is needed - no need to load and map the whole cart.
+        User user = userService.getAuthenticatedUser();
+        return cartRepository.findTotalItemsByUserId(user.getId()).orElse(0);
     }
 }

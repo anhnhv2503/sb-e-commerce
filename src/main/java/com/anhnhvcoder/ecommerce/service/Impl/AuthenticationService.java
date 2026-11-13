@@ -2,6 +2,7 @@ package com.anhnhvcoder.ecommerce.service.Impl;
 
 import com.anhnhvcoder.ecommerce.client.GoogleIdentityClient;
 import com.anhnhvcoder.ecommerce.client.GoogleUserClient;
+import com.anhnhvcoder.ecommerce.exception.InactiveUserException;
 import com.anhnhvcoder.ecommerce.exception.ResourceNotFoundException;
 import com.anhnhvcoder.ecommerce.model.User;
 import com.anhnhvcoder.ecommerce.repository.RoleRepository;
@@ -70,6 +71,10 @@ public class AuthenticationService {
                     return userRepository.save(newUser);
                 }
         );
+
+        if (user.isLockedByAdmin()) {
+            throw new InactiveUserException("Your account has been locked. Please contact the administrator.");
+        }
 
         String token = jwtUtils.generateTokenForGoogleUser(user);
         String refreshToken = jwtUtils.generateTokenForGoogleUser(user);

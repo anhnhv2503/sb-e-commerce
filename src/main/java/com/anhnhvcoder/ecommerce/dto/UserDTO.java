@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -17,4 +19,7 @@ public class UserDTO {
     private String address;
     private String email;
     private String role;
+    private boolean active;
+    private boolean locked;
+    private LocalDate createdAt;
 }

@@ -20,6 +20,9 @@ public class ShopUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid Email"));
+        if(user.isLockedByAdmin()){
+            throw new InactiveUserException("Your account has been locked. Please contact the administrator.");
+        }
         if(!user.isActive()){
             throw new InactiveUserException("Account is not activated yet! Please check your email to activate your account.");
         }

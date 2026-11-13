@@ -17,9 +17,9 @@ public class OrderMapper {
         dto.setId(order.getId());
         dto.setOrderDate(order.getOrderDate());
         dto.setTotalAmount(order.getTotalAmount());
-        dto.setOrderStatus(order.getStatus().name());
-        dto.setPaymentStatus(order.getPaymentStatus().name());
-        dto.setPaymentType(order.getPaymentType().name());
+        dto.setOrderStatus(order.getStatus() != null ? order.getStatus().name() : null);
+        dto.setPaymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus().name() : null);
+        dto.setPaymentType(order.getPaymentType() != null ? order.getPaymentType().name() : null);
         dto.setOrderCode(order.getOrderCode());
         dto.setOrderAddress(order.getOrderAddress());
         dto.setItems(orderItemMapper.toOrderItemDTOSet(order.getOrderItems()));

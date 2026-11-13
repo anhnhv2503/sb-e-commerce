@@ -6,6 +6,8 @@ import com.anhnhvcoder.ecommerce.response.AuthenticationResponse;
 import com.anhnhvcoder.ecommerce.security.jwt.JwtUtils;
 import com.anhnhvcoder.ecommerce.service.Impl.AuthenticationService;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Login with email/password or Google")
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final AuthenticationService authenticationService;
 
+    @Operation(summary = "API login", description = "Returns a JWT access token and refresh token")
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request) {
         try {
@@ -47,6 +51,7 @@ public class AuthenticationController {
         }
     }
 
+    @Operation(summary = "API Google login", description = "Exchange a Google OAuth authorization code for a JWT")
     @PostMapping("/google-login")
     public ResponseEntity<AuthenticationResponse> googleLogin(@RequestParam("code") String code){
         return ResponseEntity.ok(authenticationService.googleAuthentication(code));

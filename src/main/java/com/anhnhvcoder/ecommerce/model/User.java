@@ -2,6 +2,7 @@ package com.anhnhvcoder.ecommerce.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,11 +15,13 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@Table(indexes = @Index(name = "idx_user_phone", columnList = "phone"))
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id
@@ -32,10 +35,9 @@ public class User {
     @JsonIgnore
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private Cart cart;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    // Orders are loaded only when explicitly needed (never on login / every request).
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Order> order;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {
@@ -47,8 +49,15 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
     private boolean active;
+    @Column(name = "locked", columnDefinition = "boolean default false")
+    private Boolean locked = false;
     @CreationTimestamp
     private LocalDate createdAt;
     @UpdateTimestamp
     private LocalDate updatedAt;
+
+    @JsonIgnore
+    public boolean isLockedByAdmin() {
+        return Boolean.TRUE.equals(locked);
+    }
 }

@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        return productRepository.findWithDetailsById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 
     @Override
@@ -148,8 +148,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Size addMoreSize(Long productId, String sizeName, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        if (sizeRepository.findBySizeNameAndProductId(sizeName, productId) != null) {
-            Size existedSize = sizeRepository.findBySizeNameAndProductId(sizeName, productId);
+        Size existedSize = sizeRepository.findBySizeNameAndProductId(sizeName, productId);
+        if (existedSize != null) {
             existedSize.setQuantity(existedSize.getQuantity() + quantity);
             sizeRepository.save(existedSize);
             return existedSize;

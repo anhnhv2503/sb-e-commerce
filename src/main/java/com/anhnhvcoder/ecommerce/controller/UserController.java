@@ -7,6 +7,7 @@ import com.anhnhvcoder.ecommerce.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.mail.MessagingException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 @CrossOrigin("*")
+@Tag(name = "Users", description = "Registration, profile and password management")
 public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "API register user", description = "Sends a verification email; the account is inactive until verified")
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> registerUser(@RequestParam String fullName,
                                                     @RequestParam String phone,
@@ -44,6 +47,7 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED.value(), userService.registerAdmin(fullName, phone, email, password, address)));
     }
 
+    @Operation(summary = "API get user by id")
     @GetMapping("/{userId}/detail")
     public ResponseEntity<ApiResponse> getUserById(@PathVariable Long userId){
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.getUserById(userId)));
@@ -72,6 +76,7 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "API forgot password", description = "Sends a reset password email")
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse> forgotPassword(@RequestParam String email) throws MessagingException {
         try {
@@ -82,6 +87,7 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "API reset password", description = "Reset password with the token from the email")
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody ResetPasswordRequest request){
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), userService.resetPassword(request)));
