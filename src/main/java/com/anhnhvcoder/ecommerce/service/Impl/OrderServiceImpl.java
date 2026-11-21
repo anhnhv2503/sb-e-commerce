@@ -24,9 +24,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.PayOS;
-import vn.payos.type.CheckoutResponseData;
-import vn.payos.type.ItemData;
-import vn.payos.type.PaymentData;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
+import vn.payos.model.v2.paymentRequests.PaymentLinkItem;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -168,21 +168,21 @@ public class OrderServiceImpl implements OrderService {
         String desc = "Thanh toan " + user.getId() + "-" + orderCode;
         String returnUrl = "http://localhost:5173/payos/callback";
         String cancelUrl = "http://localhost:5173/payos/callback";
-
-        ItemData item = ItemData.builder()
+        PaymentLinkItem item = PaymentLinkItem.builder()
                 .name(product)
                 .quantity(cart.getTotalItems())
-                .price(Integer.valueOf(cart.getTotalPrice().intValue()))
+                .price(cart.getTotalPrice().longValue())
                 .build();
-        PaymentData paymentData = PaymentData.builder()
+
+        CreatePaymentLinkRequest paymentRequest = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .description(desc)
-                .amount(Integer.valueOf(cart.getTotalPrice().intValue()))
-                .returnUrl(returnUrl)
+                .amount(cart.getTotalPrice().longValue()).returnUrl(returnUrl)
                 .cancelUrl(cancelUrl)
                 .item(item)
                 .build();
-        CheckoutResponseData data = payOS.createPaymentLink(paymentData);
+
+        CreatePaymentLinkResponse paymentLinkResponse = payOS.paymentRequests().create(paymentRequest);
 
         Order order = new Order();
         order.setOrderDate(LocalDate.now());
@@ -199,7 +199,7 @@ public class OrderServiceImpl implements OrderService {
         return PaymentDTO.PayOSResponse.builder()
                 .code("OK")
                 .message("PayOS Link")
-                .paymentUrl(data.getCheckoutUrl())
+                .paymentUrl(paymentLinkResponse.getCheckoutUrl())
                 .build();
     }
 
