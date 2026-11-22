@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
                 )
         ),
         servers = {
+                @Server(url = "https://sb-e-commerce-gz32.onrender.com", description = "Production Server"),
                 @Server(url = "http://localhost:8080", description = "Local Development Server")
         }
 )
